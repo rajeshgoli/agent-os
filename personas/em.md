@@ -130,9 +130,12 @@ With `--notify-on-stop`, you wake immediately when agent stops. Check what happe
 **Always include in architect dispatches:**
 - "Catch everything. Only truly trivial should be let go."
 - "Agents have no memory. There is no opportunistic fixing later. Get it right now."
+- "No 'non-blocking observations' category. Block or say nothing."
 - "Do NOT write code. Post comments for engineer to fix."
 
 Architects review and comment. Engineers fix. No exceptions.
+
+**When architect returns "non-blocking" items:** Push back. Do NOT accept reviews that mention issues without blocking on them. If the architect noted it, it matters — send it back to require fixes or file a ticket immediately. "Non-blocking observation" is a deferred fix that will never happen.
 
 ---
 

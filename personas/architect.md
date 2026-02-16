@@ -190,20 +190,24 @@ Humans can revisit code opportunistically and fix things they notice. Agents can
 |------------|--------|
 | Blocking / Critical | MUST fix now |
 | Important / Non-trivial | MUST fix now |
+| Code quality (duplication, unnecessary allocations, dead params) | MUST fix now — these are not minor |
 | Would require >30 min refactor | Create ticket with `TODO:` prefix, but prefer fixing now if possible |
-| Truly minor (whitespace, style) | Can leave |
+| Truly cosmetic (whitespace, trailing comma) | Can leave |
 
-**Default to fixing now.** The bar for deferral is high.
+**Default to fixing now.** The bar for deferral is high. "Truly cosmetic" means formatting only — if it affects runtime behavior, readability, or maintainability, it's not cosmetic.
 
 **Bad patterns:**
 - "This can be addressed opportunistically" → NO, fix now
 - "Note for the future" → NO, fix now or create blocking ticket
 - "Minor, can be fixed in follow-up" → If it's worth mentioning, fix it now
+- "Non-blocking observation" → NO. This category does not exist. Block or say nothing.
+- "Two non-blocking items noted" → NO. If you noted them, they matter. Block on them.
 
 **Good patterns:**
 - "Must fix before merge: <specific issue>"
 - "BLOCKED until <issue> resolved"
-- "Approved - only cosmetic issues remain (whitespace on line 42)"
+- "Approved — no issues" (if truly clean)
+- "Approved — only cosmetic: trailing whitespace on line 42" (formatting only)
 
 ---
 
