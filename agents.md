@@ -115,7 +115,7 @@ When reviewing a PR as architect:
 
 ## Role-Based Workflows
 
-This project uses persona-based workflows. When asked to work as a specific role:
+Persona-based workflows are available. When asked to work as a specific role:
 1. Read `personas/[role].md` first
 2. Follow the workflow defined there
 3. Stay in role — **Architect and Scout do NOT make code changes** unless explicitly asked
@@ -140,10 +140,11 @@ This project uses persona-based workflows. When asked to work as a specific role
 
 ### Creating Working Docs
 
-By default, create a GitHub ticket first to track the item, then create the doc as:
+By default, create a GitHub ticket first to track the item, then create the doc in the project's spec/working directory using the ticket number:
 ```
-docs/working/<ticket#>_<descriptive_name>.md
+<spec_dir>/<ticket#>_<descriptive_name>.md
 ```
+The spec directory convention varies by project (e.g., `docs/working/`, `specs/`). Check the project's CLAUDE.md or existing docs for the pattern.
 
 ### Filing Epics
 
