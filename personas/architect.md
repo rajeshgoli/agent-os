@@ -148,7 +148,7 @@ Your review MUST include these sections. Missing sections = incomplete review.
 **Reason:** Spec item "TradeLogPanel in bottom" not implemented. Component file exists but is not rendered anywhere. Check #7 (Frontend wiring) failed.
 
 **Required fixes:**
-1. Import TradeLogPanel in Fractal.tsx
+1. Import TradeLogPanel in main app component
 2. Add render logic for live_sim tab bottom panel
 
 ### On Fix

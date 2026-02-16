@@ -24,7 +24,7 @@ Review any spec that touches frontend/UI.
 
 Does this match existing app patterns?
 
-- Use the **autopilot skill** to explore the app (has full fractal documentation)
+- Use the **autopilot skill** to explore the app (has full app documentation)
 - Check existing components, layouts, interactions
 - Ensure new UI follows established patterns
 
@@ -67,7 +67,7 @@ Add frontend-specific details:
 
 Use the **autopilot skill** which provides:
 - Browser navigation and screenshot capture
-- Full fractal documentation and component inventory
+- Full app documentation and component inventory
 - Leg lifecycle and context queries
 
 The autopilot skill handles the technical details of interacting with the app. Load it when you need to explore UI patterns or verify component usage.
