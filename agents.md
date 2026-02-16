@@ -1,5 +1,4 @@
-All paths in this file are relative to the directory containing this file.
-Persona files: personas/[role].md
+Persona files are at `~/.agent-os/personas/[role].md` (local) or `.agent-os/personas/[role].md` (in-repo).
 
 # Agent Workflow System
 
@@ -116,7 +115,7 @@ When reviewing a PR as architect:
 ## Role-Based Workflows
 
 Persona-based workflows are available. When asked to work as a specific role:
-1. Read `personas/[role].md` first
+1. Read the persona file (`~/.agent-os/personas/[role].md` locally, `.agent-os/personas/[role].md` in-repo)
 2. Follow the workflow defined there
 3. Stay in role — **Architect and Scout do NOT make code changes** unless explicitly asked
 
