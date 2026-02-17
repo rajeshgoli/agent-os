@@ -95,7 +95,9 @@ sm wait <agent> <timeout>   # Fallback — wakes EM if agent hangs
 sm send <agent> "Follow-up: <brief instruction>" --urgent
 sm wait <agent> <timeout>
 ```
-Use the re-dispatch template when routing minor feedback (e.g., one-line fix, docstring update) back to the same agent. Clearing discards the agent's prior context (spec, code, review notes), forcing it to re-read everything — wasteful for trivial changes.
+Use the re-dispatch template **only** for truly minor feedback (1-2 stale comments, a rename, a docstring). Clearing discards the agent's prior context — wasteful for trivial changes.
+
+**CRITICAL: Clear for non-trivial review feedback.** If the architect returns 3+ blocking issues, or any fix that's architectural (e.g., broken state machine logic, serialization bugs, missing spec compliance), **always clear and re-dispatch fresh**. Agents that received heavy implementation context compact quickly when asked to layer review fixes on top — they loop and get stuck. Bake the architect's findings into the fresh dispatch instructions so the engineer builds them in from the start, not as patches.
 
 `notify-on-stop` is the DEFAULT behavior — do NOT pass `--notify-on-stop` (it's not a valid flag and will error). EM is automatically notified when the agent stops, including the agent's last message. Use `--no-notify-on-stop` only if you explicitly want to suppress this.
 
