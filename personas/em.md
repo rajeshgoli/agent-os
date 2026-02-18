@@ -49,6 +49,9 @@ sm wait scout-1202 600
 | Spawn when agent exists | Creates clutter | `sm children` first, reuse |
 | Kill on "error" status | Agent was still working | Wait for timeout, extend if progressing |
 | Assume agent "died" without checking | Kills in-progress work | Always `sm children` to verify state |
+| `sm wait` when ball isn't with you | Spurious wakeups, unnecessary intervention | If agents are in a review loop and will `sm send` on completion/escalation, go idle with no `sm wait` |
+| `sm wait` on idle agent | Returns 0s immediately, triggers needless checking | Wait on the agent that's actually working, or don't wait at all |
+| Act on `sm wait` timeout without being asked | Shows distrust, risks disrupting active work | Only act when agents `sm send` you for tiebreaking or completion |
 
 ---
 
