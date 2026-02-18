@@ -164,7 +164,8 @@ For each issue (ONE AT A TIME):
 5. Scout and reviewer iterate directly — no round limit, no EM intervention
 6. EM intervenes **only** if agents escalate for tiebreaking
 7. On convergence, scout commits and pushes spec, then `sm send`s completion to EM
-8. EM clears scout and reviewer context, dispatches next issue
+8. EM reviews the spec. Once satisfied, dispatch scout to update the GitHub ticket to reflect the spec
+9. EM clears scout and reviewer context, dispatches next issue
 
 **Scout dispatch must include:**
 - Reviewer agent ID and instructions to `sm send` the spec for review
