@@ -149,6 +149,24 @@ Architects review and comment. Engineers fix. No exceptions.
 ```
 See `.claude/workflows/investigation.md`. Summary: Scout → Architect review → feedback loop → repeat until 0 major issues.
 
+### Spec Writing
+```
+"As EM, write specs for #<issues>"
+```
+For each issue (ONE AT A TIME):
+1. Clear scout context (`sm clear`)
+2. Dispatch scout to investigate the issue and write a spec at `docs/working/<issue#>_<name>.md`
+3. Scout sends spec to reviewer agent via `sm send` for review
+4. Scout and reviewer iterate directly — no round limit, no EM intervention
+5. EM intervenes **only** if agents escalate for tiebreaking
+6. On convergence, scout commits and pushes spec, then `sm send`s completion to EM
+7. EM clears scout and reviewer context, dispatches next issue
+
+**Dispatch must include:**
+- Reviewer agent ID and instructions to `sm send` the spec for review
+- "Report completion back to me (<em-id>) via `sm send` when spec is converged and pushed"
+- Branch and push instructions (e.g., "work on dev, push to dev")
+
 ### Implementation
 ```
 "As EM, implement epic #<number>"
