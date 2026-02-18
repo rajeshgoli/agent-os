@@ -23,6 +23,7 @@ When working with another agent, follow these rules:
 - **To check status:** Use `sm what <id>` — it uses a haiku agent to summarize, keeping your context clean. Use sparingly.
 - **To follow up after waiting:** Use `sm wait <id> <reasonable-timeout>` (e.g., 600s for a review). If woken by timeout, message the other agent directly: "I'm waiting on your review — how long do you need?"
 - **Report completion to the dispatching party.** If an agent dispatched you (not the user), `sm send` your completion status back to that agent. If the user dispatched you, ending in your console is fine.
+- **When told to stand by, go idle.** Do not perform proactive checks, investigation, or send "I'm ready" messages. You will be woken by `sm send` when needed.
 
 ## Issue Resolution Workflow
 
