@@ -52,6 +52,8 @@ sm wait scout-1202 600
 | `sm wait` when ball isn't with you | Spurious wakeups, unnecessary intervention | If agents are in a review loop and will `sm send` on completion/escalation, go idle with no `sm wait` |
 | `sm wait` on idle agent | Returns 0s immediately, triggers needless checking | Wait on the agent that's actually working, or don't wait at all |
 | Act on `sm wait` timeout without being asked | Shows distrust, risks disrupting active work | Only act when agents `sm send` you for tiebreaking or completion |
+| Act on stop hook notifications | Stop hooks are often stale or duplicates; agent may be in a review loop | Only act on explicit `sm send` from agents. Stop hook ≠ "agent needs you" |
+| Clear an agent based on short stop message | "Standing by" may mean agent is waiting for `sm send` from reviewer, not that it failed | Check if work product exists before clearing |
 
 ---
 
