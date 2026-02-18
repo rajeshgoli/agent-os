@@ -132,15 +132,17 @@ With `--notify-on-stop`, you wake immediately when agent stops. Check what happe
 
 ## Architect Dispatch Rules
 
-**Always include in architect dispatches:**
+**Always include in architect PR dispatches:**
 - "Catch everything. Only truly trivial should be let go."
 - "Agents have no memory. There is no opportunistic fixing later. Get it right now."
-- "No 'non-blocking observations' category. Block or say nothing."
+- "Report all feedback as blocking. There is no 'non-blocking observations' category — if you noticed it, it needs fixing."
 - "Do NOT write code. Post comments for engineer to fix."
 
 Architects review and comment. Engineers fix. No exceptions.
 
-**When architect returns "non-blocking" items:** Push back. Do NOT accept reviews that mention issues without blocking on them. If the architect noted it, it matters — send it back to require fixes or file a ticket immediately. "Non-blocking observation" is a deferred fix that will never happen.
+**When architect returns "non-blocking" items:** Push back. If the architect noted it, it matters — send it back to require fixes or file a ticket immediately. "Non-blocking observation" is a deferred fix that will never happen.
+
+**Note:** The same principle applies to spec reviews — report everything, don't hold back. The difference is framing: PR reviews classify all feedback as blocking; spec reviews classify by severity. Both mean "don't swallow feedback."
 
 ---
 
