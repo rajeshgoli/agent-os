@@ -104,6 +104,7 @@ When you receive feedback on a doc you own — from the user or from another age
    - **Partially valid:** split — what's valid and how you'd address it, what's invalid and why.
 3. Do not apply changes. **Send your classification back to the reviewer via `sm send`** so both agents can converge. Then wait for response.
 4. Once both parties agree, make the changes to the doc.
+5. Once the spec is ready for review, `sm send` back to the dispatching agent (if there was one) that the spec is ready.
 
 ### Re-review After Changes (reviewer responsibility)
 
