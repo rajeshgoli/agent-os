@@ -177,6 +177,7 @@ For each issue (ONE AT A TIME):
 - Reference to review protocol in agents.md
 - Scout's ID so it knows who to send feedback to
 - "Stand by for incoming spec"
+- Do NOT add "block or say nothing" — reviewer should classify all feedback by severity and have the spec owner fix everything, not just blockers
 
 ### Implementation
 ```
