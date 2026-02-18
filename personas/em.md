@@ -185,11 +185,14 @@ For each issue (ONE AT A TIME):
 ```
 "As EM, implement epic #<number>"
 ```
+
+**Key difference from spec writing:** Spec review = agents iterate directly, EM tiebreaks. PR review = EM routes between engineer and architect, clearing context between rounds. Implementation context is heavy — agents that layer review fixes on top of implementation context compact and loop. EM clears and re-dispatches fresh with findings baked in.
+
 For each ticket (ONE AT A TIME):
-1. Engineer implements
-2. Architect reviews PR
-3. Route feedback if needed
-4. Architect merges when approved
+1. Engineer implements, creates PR, reports back to EM
+2. EM dispatches architect to review PR
+3. If feedback: EM clears engineer, re-dispatches fresh with architect's findings baked in
+4. If approved: architect merges
 
 After all tickets merged, close the epic issue:
 ```bash
