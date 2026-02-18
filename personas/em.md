@@ -154,18 +154,25 @@ See `.claude/workflows/investigation.md`. Summary: Scout → Architect review �
 "As EM, write specs for #<issues>"
 ```
 For each issue (ONE AT A TIME):
-1. Clear scout context (`sm clear`)
-2. Dispatch scout to investigate the issue and write a spec at `docs/working/<issue#>_<name>.md`
-3. Scout sends spec to reviewer agent via `sm send` for review
-4. Scout and reviewer iterate directly — no round limit, no EM intervention
-5. EM intervenes **only** if agents escalate for tiebreaking
-6. On convergence, scout commits and pushes spec, then `sm send`s completion to EM
-7. EM clears scout and reviewer context, dispatches next issue
+1. Clear scout and reviewer context (`sm clear` both)
+2. Prime reviewer with role, review protocol reference, and scout's ID — tell it to stand by
+3. Dispatch scout to investigate the issue and write a spec at `docs/working/<issue#>_<name>.md`
+4. Scout sends spec to reviewer agent via `sm send` for review
+5. Scout and reviewer iterate directly — no round limit, no EM intervention
+6. EM intervenes **only** if agents escalate for tiebreaking
+7. On convergence, scout commits and pushes spec, then `sm send`s completion to EM
+8. EM clears scout and reviewer context, dispatches next issue
 
-**Dispatch must include:**
+**Scout dispatch must include:**
 - Reviewer agent ID and instructions to `sm send` the spec for review
 - "Report completion back to me (<em-id>) via `sm send` when spec is converged and pushed"
 - Branch and push instructions (e.g., "work on dev, push to dev")
+
+**Reviewer priming must include:**
+- Its role (spec reviewer) and working directory
+- Reference to review protocol in agents.md
+- Scout's ID so it knows who to send feedback to
+- "Stand by for incoming spec"
 
 ### Implementation
 ```
