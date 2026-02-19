@@ -16,6 +16,7 @@ Orchestrate workflows without burning tokens. Reuse agents, wait async, trust th
 
 ```bash
 sm name em-<epic>       # Set identity first
+sm context-monitor enable    # Register self for context monitoring
 sm children             # Check existing agents
 # Kill stale agents from previous sessions if needed
 # Target: 1 scout, 1-2 architect, 1 engineer max
@@ -67,6 +68,12 @@ sm clear <agent>               # Fresh context
 sm send <agent> "..." --urgent  # Dispatch (notify-on-stop is default)
 ```
 
+**For long-running children** (multi-hour tasks), register them after dispatch:
+```bash
+sm context-monitor enable <child-id>   # EM receives child's compaction alerts
+```
+This is a judgment call — use it for agents where compaction would be silent otherwise.
+
 **Only spawn if no agent of that type exists.** Target counts:
 - 1 scout
 - 1-2 architect
@@ -84,9 +91,22 @@ sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
 # Then dispatch with --notify-on-stop (see template below)
 ```
 
-**Sequential by default.** One agent working at a time unless user explicitly requests parallel. Spec or issue notes suggesting parallelism are not user authorization — ask first.
+**Parallelism rules:**
+- **Code changes:** One at a time per repo/worktree. Two engineers on the same repo = branch conflicts. Wait for the current code PR to merge before dispatching the next implementation.
+- **Specs:** Can run in parallel. Multiple scouts writing specs in different docs don't conflict.
+- **Spec + code:** Can run in parallel. A scout writing a spec while an engineer implements a different ticket is fine.
+- **Cross-repo code:** Can run in parallel. An engineer in the SM repo and another in the app repo don't conflict.
+- Spec or issue notes suggesting parallelism are not user authorization — ask first for anything beyond these rules.
 
-**Dispatch template (new task):**
+**Preferred: Use `sm dispatch` for all dispatches.** Templates at `~/.sm/dispatch_templates.yaml`.
+```bash
+sm dispatch <id> --role engineer --urgent --task "..." --repo <path> --spec <path>
+sm dispatch <id> --role architect --urgent --pr <number> --repo <path> --spec <path>
+sm dispatch <id> --role scout --urgent --task "..." --repo <path> --spec_path <path> --reviewer <id>
+```
+`sm dispatch` handles clear, send, and wait in one command with role-specific templates.
+
+**Manual dispatch template (when sm dispatch doesn't fit):**
 ```bash
 sm clear <agent>
 sm send <agent> "As <role>, <task>.
@@ -145,6 +165,8 @@ Architects review and comment. Engineers fix. No exceptions.
 **When architect returns "non-blocking" items:** Push back. If the architect noted it, it matters — send it back to require fixes or file a ticket immediately. "Non-blocking observation" is a deferred fix that will never happen.
 
 **Note:** The same principle applies to spec reviews — report everything, don't hold back. The difference is framing: PR reviews classify all feedback as blocking; spec reviews classify by severity. Both mean "don't swallow feedback."
+
+**Post-merge regression check:** When a PR merges to a branch that received other PRs since the feature branch was created, the merge can silently drop code from those intermediate PRs during conflict resolution. The architect's PR diff review won't catch this — the dropped code was never in the PR's diff. After merging PRs that had merge conflicts, verify that recent features (merged since the branch point) still exist in the post-merge state. Include in architect dispatch: "If this PR had merge conflicts, check that recently merged features (since branch point) weren't dropped in conflict resolution."
 
 ---
 
