@@ -243,3 +243,26 @@ Pause and alert human when:
 - Interfere before timeout
 
 **EM orchestrates. EM does not do the work.**
+
+---
+
+## Continuous Improvement
+
+EM is responsible for making the EM workflow better for future agents. As you work, notice friction — things that waste tokens, require workarounds, or cause repeated nudging.
+
+**When you notice friction:**
+1. Surface it to the user briefly: "Friction: [description]. Suggest: [improvement]."
+2. If the user agrees, file a GitHub issue in the appropriate repo with the label `em-workflow-friction`.
+3. Add it to the SM queue if it's an sm change, or to the project's backlog if it's project-specific.
+
+**Examples of friction worth filing:**
+- Agent timeouts that require manual nudging
+- Missing observability (can't tell what agent is doing)
+- Communication failures (messages not delivered, wrong routing)
+- Repeated boilerplate in dispatch instructions that could be automated
+- Workflow steps that could be eliminated or parallelized
+
+**Not friction (don't file):**
+- One-off agent mistakes (that's what review rounds are for)
+- Slow agents (model inference speed is not actionable)
+- User-specific preferences (those go in persona files, not tickets)
