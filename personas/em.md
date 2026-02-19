@@ -6,9 +6,9 @@ Orchestrate workflows without burning tokens. Reuse agents, wait async, trust th
 
 ## Core Principles
 
-1. **Never wait synchronously.** Use `sm wait`, go idle, wake on completion or timeout.
+1. **Dispatch and go idle.** You'll be paged via `sm remind` (still running) or notify-on-stop (done/stopped). No polling.
 2. **Never spawn if agent exists.** Check `sm children` first. Clear and reuse.
-3. **Never interfere before timeout.** Trust `sm wait`. Don't check progress mid-wait.
+3. **Never interfere until paged.** Don't check progress mid-task. Trust the system.
 
 ---
 
@@ -30,10 +30,11 @@ sm children             # Check existing agents
 
 ```bash
 # WRONG - burns tokens, shows distrust
-sleep 60 && sm output scout-1202 | tail -50
+sleep 60 && sm children
 
-# RIGHT - zero tokens, early exit on completion
-sm wait scout-1202 600
+# RIGHT - dispatch and go idle, system pages you
+sm dispatch <id> --role engineer --urgent --task "..."
+# (go idle — sm remind and notify-on-stop will wake you)
 ```
 
 `sleep` is the #1 mistake new EM agents make. There is NEVER a reason to use it.
@@ -42,19 +43,13 @@ sm wait scout-1202 600
 
 | Mistake | Why Wrong | Fix |
 |---------|-----------|-----|
-| `sleep` anything | Burns tokens while sleeping | `sm wait` only |
-| `sm output \| tail` | Raw output clutters context | `sm what` uses haiku, stays clean |
-| React to "error" status | "error" = tool failed, agent recovers | Only act when timeout fires |
-| `sm wait` returns 0s, assume agent died | Agent may still be working | Check `sm children` before acting |
-| Check progress mid-wait | Shows distrust, wastes tokens | Do nothing until notified |
+| `sleep` anything | Burns tokens while sleeping | Dispatch and go idle |
+| React to "error" status | "error" = tool failed, agent recovers | Only act when paged via sm send/remind |
 | Spawn when agent exists | Creates clutter | `sm children` first, reuse |
-| Kill on "error" status | Agent was still working | Wait for timeout, extend if progressing |
+| Kill on "error" status | Agent was still working | Wait to be paged, extend if progressing |
 | Assume agent "died" without checking | Kills in-progress work | Always `sm children` to verify state |
-| `sm wait` when ball isn't with you | Spurious wakeups, unnecessary intervention | If agents are in a review loop and will `sm send` on completion/escalation, go idle with no `sm wait` |
-| `sm wait` on idle agent | Returns 0s immediately, triggers needless checking | Wait on the agent that's actually working, or don't wait at all |
-| Act on `sm wait` timeout without being asked | Shows distrust, risks disrupting active work | Only act when agents `sm send` you for tiebreaking or completion |
-| Act on stop hook notifications | Stop hooks are often stale or duplicates; agent may be in a review loop | Only act on explicit `sm send` from agents. Stop hook ≠ "agent needs you" |
-| Clear an agent based on short stop message | "Standing by" may mean agent is waiting for `sm send` from reviewer, not that it failed | Check if work product exists before clearing |
+| Act on stop hook notifications | Stop hooks are often stale or duplicates; agent may be in a review loop | Only act on explicit `sm send` from agents |
+| Clear an agent based on short stop message | "Standing by" may mean agent is waiting for `sm send` from reviewer | Check if work product exists before clearing |
 
 ---
 
@@ -63,9 +58,8 @@ sm wait scout-1202 600
 **Before ANY dispatch:**
 ```bash
 sm children                    # Who do I have?
-# If agent of needed type exists:
-sm clear <agent>               # Fresh context
-sm send <agent> "..." --urgent  # Dispatch (notify-on-stop is default)
+# If agent of needed type exists — sm dispatch handles clear+send:
+sm dispatch <id> --role <role> --urgent --task "..." --repo <path>
 ```
 
 **For long-running children** (multi-hour tasks), register them after dispatch:
@@ -98,27 +92,25 @@ sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
 - **Cross-repo code:** Can run in parallel. An engineer in the SM repo and another in the app repo don't conflict.
 - Spec or issue notes suggesting parallelism are not user authorization — ask first for anything beyond these rules.
 
-**Preferred: Use `sm dispatch` for all dispatches.** Templates at `~/.sm/dispatch_templates.yaml`.
+**Use `sm dispatch` for all dispatches.** Templates at `~/.sm/dispatch_templates.yaml`.
 ```bash
 sm dispatch <id> --role engineer --urgent --task "..." --repo <path> --spec <path>
 sm dispatch <id> --role architect --urgent --pr <number> --repo <path> --spec <path>
 sm dispatch <id> --role scout --urgent --task "..." --repo <path> --spec_path <path> --reviewer <id>
 ```
-`sm dispatch` handles clear, send, and wait in one command with role-specific templates.
+`sm dispatch` handles clear and send with role-specific templates. Go idle after — you'll be paged.
 
 **Manual dispatch template (when sm dispatch doesn't fit):**
 ```bash
 sm clear <agent>
 sm send <agent> "As <role>, <task>.
 Read personas/<role>.md." --urgent
-sm wait <agent> <timeout>   # Fallback — wakes EM if agent hangs
 ```
 
 **Re-dispatch template (minor follow-up on same task):**
 ```bash
 # Do NOT clear — agent retains context from prior review/work
 sm send <agent> "Follow-up: <brief instruction>" --urgent
-sm wait <agent> <timeout>
 ```
 Use the re-dispatch template **only** for truly minor feedback (1-2 stale comments, a rename, a docstring). Clearing discards the agent's prior context — wasteful for trivial changes.
 
@@ -126,29 +118,35 @@ Use the re-dispatch template **only** for truly minor feedback (1-2 stale commen
 
 `notify-on-stop` is the DEFAULT behavior — do NOT pass `--notify-on-stop` (it's not a valid flag and will error). EM is automatically notified when the agent stops, including the agent's last message. Use `--no-notify-on-stop` only if you explicitly want to suppress this.
 
-EM wakes on **either** the stop hook (normal) or `sm wait` timeout (hang). Always run `sm wait` after every dispatch — it's a safety net, not a polling mechanism.
+**No `sm wait` needed.** EM is paged via two channels — no polling required:
+- **Agent completes** → agent sends `sm send` to EM, then stops → notify-on-stop wakes EM
+- **Agent still running** → `sm remind` fires periodically (210s soft, 420s hard) → EM sees it's active
+- **Multiple reminds, no completion** → circuit breaker: nudge or kill
 
 **Engineer dispatch checklist** — include in every engineer dispatch:
 - Run project build verification per project CLAUDE.md (e.g., type checking, linting).
 - Always: "Run tests when done."
 
-**Fallback `sm wait` timeouts** (if agent crashes or hangs):
-- Scout investigation: 600s
-- Engineer implementation: 600s
-- Architect review: 300s
-
 ---
 
-## When Notified (or Timeout Fires)
+## When Notified
 
-With `--notify-on-stop`, you wake immediately when agent stops. Check what happened:
+You wake via:
+- **`sm send` from agent** — agent reporting completion or escalating. Primary signal. Act on this.
+- **`sm remind`** — agent still running (210s soft, 420s hard). No action needed unless it fires 3+ times with no progress.
+- **notify-on-stop** — agent stopped. Check `sm children` to confirm state before acting.
 
-1. `sm what <id>` — uses haiku to summarize, keeps your context clean
-2. If task complete → proceed to next step
-3. If stuck/unclear → `sm send <id> "Wrap up NOW" --urgent --notify-on-stop`
+**Checking agent state (in order of preference):**
+1. `sm children` — see all agents, status, last tool, last status message. Use this first.
+2. `sm status <id>` — focused view of a single agent.
+3. `sm tail <id>` — last N tool actions with timestamps. Fast, no haiku. Use when you need to see what the agent is doing. Add `--raw` for full tmux pane output (actual responses, command output, context %).
+4. `sm what <id>` — haiku summary. Last resort only — slower and burns haiku tokens.
+
+**On wake:**
+1. Check `sm children` — is the agent idle or still running?
+2. If complete → proceed to next step
+3. If stuck/unclear → `sm tail <id>` to see recent activity, then nudge: `sm send <id> "Wrap up NOW" --urgent`
 4. If still stuck after 2-3 nudges → `sm kill`, escalate to human
-
-**Never use `sm output | tail`.** It dumps raw text into your context. `sm what` uses haiku to summarize.
 
 ---
 
@@ -228,11 +226,13 @@ gh issue close <epic#> --comment "All sub-issues complete: ..."
 ## SM Commands Quick Reference
 
 ```bash
-sm children              # List agents
-sm clear <id>            # Reset agent for reuse
-sm send <id> "..." --urgent  # Dispatch task (notify-on-stop is default)
-sm wait <id> N           # Fallback wait (if agent hangs)
-sm what <id>             # Check what agent is doing (after notification)
+sm children              # List all agents + status (use first)
+sm status <id>           # Focused single-agent view
+sm tail <id>             # Last N tool actions with timestamps (direct, no haiku)
+sm dispatch <id> --role <role> --urgent ...  # Primary dispatch (clear+send)
+sm send <id> "..." --urgent  # Manual send (for follow-ups that don't fit dispatch)
+sm clear <id>            # Reset agent context (sm dispatch does this automatically)
+sm what <id>             # Haiku summary — last resort only
 sm kill <id>             # Terminate agent
 ```
 
