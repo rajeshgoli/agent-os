@@ -217,7 +217,7 @@ For each issue (ONE AT A TIME):
 For each ticket (ONE AT A TIME):
 1. Engineer implements, creates PR, reports back to EM
 2. EM dispatches architect to review PR
-3. If feedback: EM clears engineer, re-dispatches fresh with architect's findings baked in
+3. If feedback: `sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>` — reads PR review automatically, no manual findings bake-in needed
 4. If approved: architect merges
 
 After all tickets merged, close the epic issue:
@@ -234,11 +234,14 @@ sm children              # List all agents + status (use first)
 sm status <id>           # Focused single-agent view
 sm tail <id>             # Last N tool actions with timestamps (direct, no haiku)
 sm dispatch <id> --role <role> --urgent ...  # Primary dispatch (clear+send)
+sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>  # Fix all architect issues on a PR
 sm send <id> "..." --urgent  # Manual send (for follow-ups that don't fit dispatch)
 sm clear <id>            # Reset agent context (sm dispatch does this automatically)
 sm what <id>             # Haiku summary — last resort only
 sm kill <id>             # Terminate agent
 ```
+
+**Dispatch params are role-specific.** Check `~/.sm/dispatch_templates.yaml` for required params before dispatching a new role. `--dry-run` shows the expanded template without sending.
 
 Use `sm -h` for full documentation.
 
