@@ -81,7 +81,8 @@ sm name <id> engineer-1510   # Relabel to match current role
 ```bash
 sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
 #        ^^^^^^ provider required
-# Then dispatch with --notify-on-stop (see template below)
+# When parent is EM (is_em=True), remind + context monitoring + notify-on-stop
+# are auto-registered on the spawned agent. No manual registration needed.
 ```
 
 **Parallelism rules:**
@@ -116,6 +117,10 @@ Use the re-dispatch template **only** for truly minor feedback (1-2 stale commen
 **CRITICAL: Clear for non-trivial review feedback.** If the architect returns 3+ blocking issues, or any fix that's architectural (e.g., broken state machine logic, serialization bugs, missing spec compliance), **always clear and re-dispatch fresh**. Agents that received heavy implementation context compact quickly when asked to layer review fixes on top — they loop and get stuck. Bake the architect's findings into the fresh dispatch instructions so the engineer builds them in from the start, not as patches.
 
 `notify-on-stop` is the DEFAULT behavior — do NOT pass `--notify-on-stop` (it's not a valid flag and will error). EM is automatically notified when the agent stops, including the agent's last message. Use `--no-notify-on-stop` only if you explicitly want to suppress this.
+
+**`sm task-complete`:** Agents can call this when done to cancel pending remind registrations and silence remind noise while idle. EM receives a task-complete notification. No EM action required — just awareness that the agent has self-reported completion.
+
+**Dispatch template quirk:** Curly-brace vars (e.g. `{id}`) in `--task` strings cause parse errors. Use square brackets instead (e.g. `[id]`).
 
 **No `sm wait` needed.** EM is paged via two channels — no polling required:
 - **Agent completes** → agent sends `sm send` to EM, then stops → notify-on-stop wakes EM
