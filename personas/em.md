@@ -15,8 +15,7 @@ Orchestrate workflows without burning tokens. Reuse agents, wait async, trust th
 ## Pre-Flight
 
 ```bash
-sm name em-<epic>       # Set identity first
-sm context-monitor enable    # Register self for context monitoring
+sm em <epic>            # One-shot: sets name (em-<epic>), enables context monitoring
 sm children             # Check existing agents
 # Kill stale agents from previous sessions if needed
 # Target: 1 scout, 1-2 architect, 1 engineer max
