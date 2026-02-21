@@ -93,8 +93,20 @@ sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
 - Spec or issue notes suggesting parallelism are not user authorization — ask first for anything beyond these rules.
 
 **Use `sm dispatch` for all dispatches.** Templates at `~/.sm/dispatch_templates.yaml`.
+
+**Required params per role:**
+
+| Role | Required | Optional |
+|------|----------|----------|
+| engineer | `--task`, `--repo`, `--base_branch` | `--spec`, `--extra` |
+| architect | `--pr`, `--repo` | `--spec`, `--extra` |
+| architect-merge | `--pr`, `--repo` | `--spec`, `--extra` |
+| fix-pr-review | `--pr`, `--repo` | `--spec`, `--extra` |
+| scout | `--task`, `--repo` | `--reviewer`, `--spec_path`, `--extra` |
+| spec-reviewer | `--scout_id`, `--repo` | `--extra` |
+
 ```bash
-sm dispatch <id> --role engineer --urgent --task "..." --repo <path> --spec <path>
+sm dispatch <id> --role engineer --urgent --task "..." --repo <path> --base_branch dev --spec <path>
 sm dispatch <id> --role architect --urgent --pr <number> --repo <path> --spec <path>
 sm dispatch <id> --role scout --urgent --task "..." --repo <path> --spec_path <path> --reviewer <id>
 ```
