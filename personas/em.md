@@ -237,9 +237,19 @@ For each issue (ONE AT A TIME):
    - If feedback: `sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>`
    - If approved: architect merges
 4. **Validation gate.** After all work items merge, present findings to the user. Summarize what was built, what was learned, and what the strategy doc says the next step is. **Wait for user steer before filing the next execution ticket.** Do NOT auto-proceed.
-5. **Update strategy doc.** Based on findings and user steer, update the strategy doc if the validation ladder needs revision.
+5. **Backlog review.** At the validation gate, review the deliverable backlog (items architects logged as non-blocking). Bundle items that touch the same code area as the next deliverable into its execution tickets. Prune items whose code path is abandoned by new learnings. Dead backlog is noise — delete it.
+6. **Update strategy doc.** Based on findings and user steer, update the strategy doc if needed.
 
 **The validation gate is the core serialization point.** Within a deliverable, maximize parallelism. Across deliverables, serialize on user review. The user decides whether to continue, steer, or stop.
+
+### Backlog Management
+
+Architect PR reviews produce two outputs: blockers (engineer fixes before merge) and tracked items (logged to backlog). EM owns the backlog lifecycle:
+
+- **Where it lives:** `## Backlog` section in the strategy doc, or a standalone file if no strategy doc exists.
+- **When to bundle:** Before dispatching new work on a code area with outstanding backlog items, fold those items into the execution tickets. Don't build on top of known debt.
+- **When to prune:** When learnings steer away from a code path, delete its backlog items. When a backlog item is no longer relevant after a validation gate, delete it.
+- **When to escalate:** If backlog items accumulate faster than they're bundled, surface this to the user at the validation gate — it may indicate scope or quality issues.
 
 ---
 
