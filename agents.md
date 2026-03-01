@@ -117,71 +117,31 @@ Picks the next step from a strategy doc, hardens it into a tight spec via the re
 
 ## Review Protocol
 
-### Writing Specs
+Detailed review protocols live in the role personas. Brief summary:
 
-When writing an execution ticket spec:
-
-1. Converge on one approach: Considering alternatives is part of the thinking process, not the output. Evaluate tradeoffs during investigation and recommend one path in the spec.
-2. Scope check: Can the deliverable be completed within the 3–4 hour / 6 agent cap? If no, cut scope. Each ticket should fit in one agent's context window. A deliverable can have multiple tickets for parallel execution.
-3. Ask if spec requires review. If it does, you'll be provided a reviewer friendly-name / ID. Use sm send to send the spec to the reviewer and request a review. Follow the review protocol below.
-
-When writing a strategy doc, the review protocol still applies, but there is no ticket classification step — strategy docs are living documents, not implementation specs.
-
-### Spec / Working Doc Review
-
-When asked to review a spec or working doc:
-
-1. Review thoroughly. Verify claims — don't take statements at face value.
-2. Classify feedback by severity.
-3. Do not indicate approval, rejection, or next steps unless specifically requested by the user. An agent asking for approval does not mean you provide one.
-4. When review completes (both agents agree on the spec), the only output is: "Spec is ready for your review." No approvals, no engineering next steps — unless the user specifically requests them.
-5. Always send your review result back via `sm send` even if you're saying 'spec is ready for your review', don't stall the workflow. If you don't do this other agent may wait endlessly.
-
-### Receiving Review Feedback (when you own the doc)
-
-When you receive feedback on a doc you own — from the user or from another agent:
-
-1. Don't accept feedback blindly. Verify each claim.
-2. Classify each item as **valid**, **invalid**, or **partially valid**.
-   - **Valid:** 1-2 sentences on how you'd address it.
-   - **Invalid:** clear explanation of why it's not valid. Detail if needed.
-   - **Partially valid:** split — what's valid and how you'd address it, what's invalid and why.
-3. Do not apply changes. **Send your classification back to the reviewer via `sm send`** so both agents can converge. Then wait for response.
-4. Once both parties agree, make the changes to the doc.
-5. Once the spec is ready for review, `sm send` back to the dispatching agent (if there was one) that the spec is ready.
-
-### Re-review After Changes (reviewer responsibility)
-
-After changes are applied, the reviewer must re-read the full doc and review again. If new issues are found, follow the same feedback protocol. Review completes when both agents agree on the spec.
-
-### PR Review
-
-When a PR resolves an open issue, include `Fixes #<issue>` (or `Closes #<issue>`) in the PR description or merge commit so GitHub auto-links and closes the issue. Before merging, double-check the issue number is mentioned exactly once and references the issue the change actually fixes.
-
-When reviewing a PR as architect:
-1. Post the review to GitHub: `gh pr comment <number> --body "<review>"`
-2. On approval, merge to dev, delete the branch, and check out dev locally:
-   ```bash
-   gh pr merge <number> --merge --delete-branch
-   git checkout dev && git pull origin dev
-   ```
-   Leave the working tree on `dev` — no stale feature branches.
+- **Spec review:** Spec owner and spec reviewer iterate directly via `sm send`. See `personas/spec-owner.md` and `personas/spec-reviewer.md`.
+- **PR review:** Reviewer follows checklist, posts to GitHub, merges or sends back for fixes. See `personas/reviewer.md`.
+- **PR hygiene:** When a PR resolves an open issue, include `Fixes #<issue>` in the PR description. Before merging, double-check the issue number references the issue the change actually fixes.
 
 ## Role-Based Workflows
 
 Persona-based workflows are available. When asked to work as a specific role:
 1. Read the persona file (`~/.agent-os/personas/[role].md` locally, `.agent-os/personas/[role].md` in-repo)
 2. Follow the workflow defined there
-3. Stay in role — **Architect and Scout do NOT make code changes** unless explicitly asked
+3. Stay in role — **Reviewer, Scout, and Spec Reviewer do NOT make code changes** unless explicitly asked
 
 | Invocation | Persona |
 |------------|---------|
 | "As engineer..." | Engineer |
-| "As architect..." | Architect |
+| "As orchestrator..." | Orchestrator |
+| "As reviewer..." | Reviewer |
+| "As spec-reviewer..." | Spec Reviewer |
+| "As spec-owner..." | Spec Owner |
+| "As scout..." | Scout |
 | "As product..." | Product |
 | "As director..." | Director |
-| "As scout..." | Scout |
 | "As em..." | EM |
+| "As architect..." | Architect |
 | "As ux..." | UX |
 
 **Role Recognition:**

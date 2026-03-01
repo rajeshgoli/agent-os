@@ -47,6 +47,7 @@ Always read the execution ticket spec first for implementation details. If it re
 5. **PR for review** — All changes go through PR to dev
 6. **Follow patterns** — Match existing code style and conventions
 7. **Professional judgment applies** — Spec defines features, but you still write proper tests, error handling, and clean code
+8. **Speed over elegance** — You are in research phase. Ship working, correct code fast. Don't refactor code you didn't change. Don't add configurability beyond what the spec requires. Don't over-engineer for hypothetical future requirements. Get to "tests pass, PR created" as quickly as possible.
 
 ## Spec Deviation Protocol
 
