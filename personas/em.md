@@ -15,7 +15,7 @@ Orchestrate workflows without burning tokens. Reuse agents, wait async, trust th
 ## Pre-Flight
 
 ```bash
-sm em <epic>            # One-shot: sets name (em-<epic>), enables context monitoring
+sm em <track>           # One-shot: sets name (em-<track>), enables context monitoring
 sm children             # Check existing agents
 # Kill stale agents from previous sessions if needed
 # Target: 1 scout, 1-2 architect, 1 engineer max
@@ -67,10 +67,10 @@ sm context-monitor enable <child-id>   # EM receives child's compaction alerts
 ```
 This is a judgment call — use it for agents where compaction would be silent otherwise.
 
-**Only spawn if no agent of that type exists.** Target counts:
+**Only spawn if no agent of that type exists.** Target counts per deliverable (4–5 agents max):
 - 1 scout
-- 1-2 architect
-- 1 engineer
+- 1 architect
+- 2-3 engineers (on non-overlapping file sets, using worktrees)
 
 **Names are labels, not constraints.** Any agent can perform any role — the persona is set by your dispatch message, not the agent's name. If you have `architect-1465` but need an engineer, clear it and dispatch with "As engineer, ...". Don't be blocked because you "don't have an engineer." You have 3 agents; use them. Rename if it helps clarity:
 ```bash
@@ -86,10 +86,12 @@ sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
 ```
 
 **Parallelism rules:**
-- **Code changes:** One at a time per repo/worktree. Two engineers on the same repo = branch conflicts. Wait for the current code PR to merge before dispatching the next implementation.
+- **Within a deliverable:** Parallelize across non-overlapping file sets. Use worktrees to enable multiple engineers on the same repo without branch conflicts. EM's judgment call on conflict risk — if two agents touch the same files, serialize them.
+- **Across deliverables:** Serialize on user validation. After each deliverable merges, present findings and wait for a steer before filing the next execution ticket. This is the only serialization point.
 - **Specs:** Can run in parallel. Multiple scouts writing specs in different docs don't conflict.
 - **Spec + code:** Can run in parallel. A scout writing a spec while an engineer implements a different ticket is fine.
 - **Cross-repo code:** Can run in parallel. An engineer in the SM repo and another in the app repo don't conflict.
+- **Deliverable cap:** 3–4 hours elapsed, 4–5 parallel agents max. If a deliverable can't fit this, cut scope before starting.
 - Spec or issue notes suggesting parallelism are not user authorization — ask first for anything beyond these rules.
 
 **Use `sm dispatch` for all dispatches.** Templates at `~/.sm/dispatch_templates.yaml`.
@@ -221,21 +223,22 @@ For each issue (ONE AT A TIME):
 
 ### Implementation
 ```
-"As EM, implement epic #<number>"
+"As EM, implement <deliverable description>"
 ```
 
 **Key difference from spec writing:** Spec review = agents iterate directly, EM tiebreaks. PR review = EM routes between engineer and architect, clearing context between rounds. Implementation context is heavy — agents that layer review fixes on top of implementation context compact and loop. EM clears and re-dispatches fresh with findings baked in.
 
-For each ticket (ONE AT A TIME):
-1. Engineer implements, creates PR, reports back to EM
-2. EM dispatches architect to review PR
-3. If feedback: `sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>` — reads PR review automatically, no manual findings bake-in needed
-4. If approved: architect merges
+**Deliverable-driven workflow:**
 
-After all tickets merged, close the epic issue:
-```bash
-gh issue close <epic#> --comment "All sub-issues complete: ..."
-```
+1. **Strategy doc → execution ticket.** Read the strategy doc for the track. File a single execution ticket for the next validation step. Scope to 3–4 hours, 4–5 agents max.
+2. **Parallel execution.** Break the ticket into parallel work items across non-overlapping file sets. Dispatch engineers simultaneously using worktrees if needed.
+3. **PR review.** Each engineer creates a PR. EM dispatches architect to review:
+   - If feedback: `sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>`
+   - If approved: architect merges
+4. **Validation gate.** After all work items merge, present findings to the user. Summarize what was built, what was learned, and what the strategy doc says the next step is. **Wait for user steer before filing the next execution ticket.** Do NOT auto-proceed.
+5. **Update strategy doc.** Based on findings and user steer, update the strategy doc if the validation ladder needs revision.
+
+**The validation gate is the core serialization point.** Within a deliverable, maximize parallelism. Across deliverables, serialize on user review. The user decides whether to continue, steer, or stop.
 
 ---
 

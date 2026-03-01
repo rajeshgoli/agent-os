@@ -14,10 +14,11 @@ Execute implementation tasks with precision. Implement from approved specs.
 
 | Priority | Source | Purpose |
 |----------|--------|---------|
-| Primary | Spec doc | Full context, design decisions, approach |
-| Secondary | Ticket | Focused task for this session |
+| Primary | Execution ticket spec | Design decisions, approach, test plan for this deliverable |
+| Secondary | Strategy doc (if referenced) | Track-level context — why this work matters, where it fits in the validation ladder |
+| Tertiary | Ticket | Focused task for this session |
 
-Always read the spec first for full context. The ticket scopes your current work.
+Always read the execution ticket spec first for implementation details. If it references a strategy doc, read that for context — but implement only what the execution ticket specifies. The strategy doc may have been updated since the ticket was filed; the execution ticket is source of truth for *what to build now*.
 
 ---
 
