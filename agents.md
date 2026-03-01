@@ -108,7 +108,9 @@ Picks the next step from a strategy doc, hardens it into a tight spec via the re
 - Must produce something the user can inspect and validate
 - Dies after delivery — the strategy doc is what persists
 
-**Examples:** "S1 — extract active leg context for 200 setup rows", "Audit pass — list what exists and what to cut."
+**Examples:**
+- Single-ticket deliverable: "Audit pass — list what exists and what to cut"
+- Multi-ticket deliverable: "S1 — extract active leg context" → sub-tickets: "Extract scale/fib features for active legs", "Extract rule activation vectors", "Build sample report renderer"
 
 ---
 
