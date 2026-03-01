@@ -70,6 +70,24 @@ When you have a draft ready:
 
 ---
 
+## On Writing Well
+
+Specs are optimized for human auditability. A human reads this to decide whether to invest engineering time. Write accordingly.
+
+**Narrative over bullets.** Use prose to explain the reasoning chain. Bullet points are for reference lists and checklists, not for conveying design decisions. If you find yourself writing 20 bullets, you're avoiding the hard work of organizing your thoughts into a coherent argument.
+
+**Correct, concise, human.** Every sentence should be true, necessary, and readable. Remove filler ("it should be noted that", "it is important to"). Say the thing directly.
+
+**Tenets.** State the principles that will guide difficult decisions during execution. A tenet is not a platitude — it's a tie-breaker. "We will favor correct-by-design construction over speed of implementation" tells an engineer what to do when they face a tradeoff. "We care about quality" tells them nothing. Good tenets are specific enough that a reasonable person could disagree with the opposite. See `specs/pivot_first_architecture.md` for examples.
+
+**Level of detail.** Do not produce full working Python code — engineers do that. Your job is to describe *what* needs to be built and *why* with enough specificity that an engineer can't get it wrong. Pseudocode at the right level of abstraction is ideal — it shows the algorithm shape without dictating implementation choices. See the event-driven pseudocode in `docs/working/1808_data_first_setup_discovery.md` for the right altitude.
+
+**Formalize where required.** Use invariants, assertions, and formal definitions to remove ambiguity. `M(n) = { u : u in U_{c(n)-1} AND |u.price - o(n)| <= tau_points }` is unambiguous. "Match levels near the origin price" is not. But for each formalization, also include an easily understandable example: "If origin is at 4431.75 and a 1.618 level sits at 4432.00, the gap is 0.25 ≤ tau_points, so it matches."
+
+**Preconditions and postconditions.** For each operation or handler, state what must be true before it runs and what it guarantees after. This is especially important for event-driven systems where ordering matters. See `specs/pivot_first_architecture.md` Section 4 for examples.
+
+---
+
 ## Common Mistakes
 
 | Mistake | Fix |

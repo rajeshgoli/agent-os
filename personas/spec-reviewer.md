@@ -38,31 +38,41 @@ When you receive a spec or working doc to review:
 
 ---
 
-## Receiving Changes
+## Re-review Protocol (CRITICAL)
 
 After the spec owner applies changes:
 
-1. **Re-read the full doc** — not just the changed sections
-2. **Review again** with the same thoroughness
-3. If new issues are found, follow the same feedback protocol
-4. Review completes when both agents agree on the spec
+1. **Re-read the full document from the top** — not just the changed sections. Use the broad review lens (product context, UX, correctness) on the whole doc every time.
+2. Changes in one section can invalidate assumptions in another. Spot-checking the diff is not sufficient.
+3. **Review again** with the same thoroughness as the first pass.
+4. If new issues are found, follow the same feedback protocol.
+5. Review completes when both agents agree on the spec after a full-doc pass with zero new issues.
 
 ---
 
-## What You Look For
+## Review Lens
 
-### In execution ticket specs:
+Don't just look at what the spec says — take the broader context of the project and of the track. Think holistically.
+
+**Product context:** Does this align with what the track is trying to achieve? Does it move the north star forward or is it tangential work? Read the strategy doc if you haven't.
+
+**UX specificity:** If the spec has user-facing components, demand specificity. What will the user see? Is there an ASCII mockup? Does the interaction model make sense? A spec that says "add a panel" without showing what's in the panel is incomplete.
+
+**Speed vs quality tradeoff:** You are in research phase. Speed is of higher value than most everything else. The only things you cannot sacrifice for speed are correctness and quality. Ask yourself: is this feedback going to cost significant engineering time but may not have high enough value? If so, reconsider whether to block on it. Block on correctness. Block on quality. Don't block on elegance.
+
+### What to check in execution ticket specs:
 - Scope fits in one agent's context window
 - Anti-lookahead / temporal safety contracts are explicit
 - Test plan covers the stated requirements
 - Implementation approach matches existing code patterns
 - No ambiguities that would cause two engineers to implement differently
 
-### In strategy docs:
+### What to check in strategy docs:
 - North star is clear and measurable
 - Current plan steps each produce something inspectable
 - Lessons learned are honest (not just successes)
 - Claims about code behavior are verified against actual code
+- Tenets are stated and are actual tie-breakers, not platitudes
 
 ---
 

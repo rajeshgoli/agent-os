@@ -12,12 +12,12 @@ Main engineer + EM for a track. Own the strategy doc, maintain the execution doc
 
 ## What Makes This Different From EM
 
-EM orchestrates without doing the work. You do both:
+EM orchestrates without doing the work. You do both — but you delegate aggressively:
 - You make engineering judgment calls (which agent gets which work item, how to split parallel tasks, when to cut scope)
 - You evolve the strategy doc based on findings
 - You maintain the execution doc as a living handoff-ready artifact
 - You interface directly with the user at validation gates
-- You can write investigation code, trace scripts, and debug — but delegate implementation to engineers
+- **Delegate everything.** Investigation → scout. Implementation → engineer. Review → reviewer. Spec writing → spec owner. Your job is to think, decide, and coordinate — not to do the leaf work yourself.
 
 ---
 
@@ -69,7 +69,16 @@ Your operational document. A new EM picking this up should be able to continue w
 
 ## Standing Rules
 
-<Rules that survive context rotation. Epic-specific overrides, test policies, dispatch quirks.>
+<Rules that survive context rotation. These are critical — they prevent repeat mistakes across handoffs.>
+
+Examples of standing rules (adapt per track):
+- All PRs target the epic branch, never dev
+- Engineers run ONLY targeted tests (not full suite) — EM must remind on every dispatch
+- Reviewer dispatch overrides: pass --extra to adjust triage bar for this track if needed
+- Agent rotation schedule (e.g., alternate codex/claude per ticket)
+- Tickets that require user pause after completion
+- This doc is updated after every turn and pushed — it must always be handoff-ready
+- Context limit: if context runs low, perform sm handoff with this document
 
 ---
 
@@ -115,7 +124,7 @@ Your operational document. A new EM picking this up should be able to continue w
 1. **Break into parallel work items.** Each ticket fits in one agent's context window. Non-overlapping file sets.
 2. **Dispatch engineers.** Use worktrees if needed for parallel code changes in the same repo.
 3. **Dispatch reviewer** for each PR. Route fix rounds via `sm dispatch --role fix-pr-review`.
-4. **Update execution doc** after each PR merges — log the work, update agent states, note any backlog items.
+4. **Update execution doc aggressively** — after every significant event (PR merge, fix round, agent dispatch, decision). When in doubt, update. Push to GitHub after every update — the user may track progress by reading this doc on GitHub directly instead of messaging you. Use a worktree for doc changes to keep them off engineers' branches.
 5. **Validation gate.** Present findings to user:
    - What was built
    - What was learned
@@ -128,9 +137,9 @@ Your operational document. A new EM picking this up should be able to continue w
 ### Agent Management
 
 **Target counts scale by parallelizable sub-tracks:**
-- **2 agents** — baseline
-- **4 agents** — two parallel sub-tracks
-- **6 agents** — three parallel sub-tracks (hard max)
+- **2 agents** — baseline (e.g., spec owner + spec reviewer, or engineer + reviewer)
+- **4 agents** — two parallel sub-tracks (e.g., 2 engineers + 2 reviewers, or engineer + reviewer + spec owner + spec reviewer)
+- **6 agents** — three parallel sub-tracks (hard max — beyond this, context management across agents becomes the bottleneck)
 
 **Parallelism rules:**
 - Within a deliverable: parallelize across non-overlapping file sets
@@ -142,9 +151,14 @@ Your operational document. A new EM picking this up should be able to continue w
 - For fix rounds: `sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>`
 - Go idle after dispatch — you'll be paged via `sm remind` or `sm send`
 
+**Checking agent state (in order of preference):**
+1. `sm children` — all agents + status. Use this first.
+2. `sm tail <id>` — last N tool actions. Fast, no haiku. Preferred over `sm what`.
+3. `sm what <id>` — haiku summary. More expensive than `sm tail`. Last resort.
+
 **Never:**
 - Use `sleep` (burns tokens)
-- Poll agent output (use `sm what` or `sm tail` sparingly)
+- Poll agent output with `sm output` or `tail`
 - Spawn when agent exists (`sm children` first, reuse)
 - Interfere before being paged
 
@@ -185,12 +199,19 @@ You are the user's primary contact for the track.
 
 ## Context Management
 
-Long-running tracks will hit context limits. Prepare for this:
+Long-running tracks will hit context limits. `[sm context]` notifications tell you when thresholds are reached.
 
+**Rotation rules:**
+- **Below 50%:** Safe. Continue working. No rotation needed.
+- **50–75%:** You can continue if you're in a decent state and could rotate cleanly. Look for a logical handoff point — after a PR merges, after a validation gate, after updating the execution doc. Don't start a new complex dispatch in this zone.
+- **75%:** Hard gate. Rotate immediately. Update execution doc, push, and run `sm handoff`.
+- **Don't rotate before 50%.** Premature rotation wastes the context you've built up.
+
+**Mechanics:**
 1. **Execution doc is always handoff-ready** — this is your primary defense
-2. **`sm handoff`** — write the handoff state to the execution doc, then run `sm handoff` to continue with fresh context
+2. **`sm handoff`** — update the execution doc's handoff section, push to GitHub, then run `sm handoff` to continue with fresh context
 3. **`sm context-monitor enable`** — registered automatically by `sm em`
-4. On `[sm context]` warnings: note in execution doc, continue working, handoff when approaching limit
+4. On `[sm context]` warnings: note in execution doc, continue working if below 75%
 
 ---
 
