@@ -2,6 +2,15 @@
 
 Workflow system for AI coding agents. Provides personas, review protocols, and conventions that work across Claude Code and Codex.
 
+## Branches
+
+| Branch | Philosophy | Use when... |
+|--------|-----------|-------------|
+| `main` | **Infra mode** — fix everything, sequential epics, full test coverage | The codebase is stable infrastructure. Correctness is paramount. |
+| `research` | **Research mode** — strategy docs, validation gates, parallel execution, speed over elegance | The codebase is exploratory. You're discovering what to build. |
+
+Repos select a branch via git submodule tracking (see Setup below). The `research` branch adds personas for orchestrator, reviewer, spec-owner, and spec-reviewer roles, along with a strategy doc / execution ticket document model.
+
 ## What's in here
 
 - **agents.md** — Core workflow instructions (attribution, review protocol, role invocation, ticket conventions)
@@ -21,10 +30,14 @@ Project-specific instructions stay in each project's `CLAUDE.md`.
 
 ### Codex (in-repo)
 
-Add as a submodule so Codex can read the workflow:
+Add as a submodule. Use the `branch` option to select the philosophy:
 
 ```bash
+# Infra mode (default — this branch)
 git submodule add git@github.com:rajeshgoli/agent-os.git .agent-os
+
+# Research mode
+git submodule add -b research git@github.com:rajeshgoli/agent-os.git .agent-os
 ```
 
 Then in your project's `AGENTS.md`:
