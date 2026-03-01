@@ -67,10 +67,10 @@ sm context-monitor enable <child-id>   # EM receives child's compaction alerts
 ```
 This is a judgment call — use it for agents where compaction would be silent otherwise.
 
-**Only spawn if no agent of that type exists.** Target counts per deliverable (4–5 agents max):
-- 1 scout
-- 1 architect
-- 2-3 engineers (on non-overlapping file sets, using worktrees)
+**Only spawn if no agent of that type exists.** Target counts scale by parallelizable sub-tracks:
+- **2 agents** — baseline (no parallelism within the deliverable)
+- **4 agents** — two parallel sub-tracks possible
+- **6 agents** — three parallel sub-tracks possible (hard max — beyond 6, context management across agents becomes the bottleneck)
 
 **Names are labels, not constraints.** Any agent can perform any role — the persona is set by your dispatch message, not the agent's name. If you have `architect-1465` but need an engineer, clear it and dispatch with "As engineer, ...". Don't be blocked because you "don't have an engineer." You have 3 agents; use them. Rename if it helps clarity:
 ```bash
@@ -91,7 +91,7 @@ sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
 - **Specs:** Can run in parallel. Multiple scouts writing specs in different docs don't conflict.
 - **Spec + code:** Can run in parallel. A scout writing a spec while an engineer implements a different ticket is fine.
 - **Cross-repo code:** Can run in parallel. An engineer in the SM repo and another in the app repo don't conflict.
-- **Deliverable cap:** 3–4 hours elapsed, 4–5 parallel agents max. If a deliverable can't fit this, cut scope before starting.
+- **Deliverable cap:** 3–4 hours elapsed, up to 6 parallel agents. If a deliverable can't fit this, cut scope before starting.
 - Spec or issue notes suggesting parallelism are not user authorization — ask first for anything beyond these rules.
 
 **Use `sm dispatch` for all dispatches.** Templates at `~/.sm/dispatch_templates.yaml`.
@@ -171,16 +171,17 @@ You wake via:
 ## Architect Dispatch Rules
 
 **Always include in architect PR dispatches:**
-- "Catch everything. Only truly trivial should be let go."
-- "Agents have no memory. There is no opportunistic fixing later. Get it right now."
-- "Report all feedback as blocking. There is no 'non-blocking observations' category — if you noticed it, it needs fixing."
-- "Do NOT write code. Post comments for engineer to fix."
+- "Catch everything. Block on correctness/spec/architecture issues. Log code quality and improvement items to the deliverable backlog."
+- "Do NOT write code. Post comments for engineer to fix blockers."
 
-Architects review and comment. Engineers fix. No exceptions.
+Architects review and comment. Engineers fix blockers. Non-blockers get logged to backlog.
 
-**When architect returns "non-blocking" items:** Push back. If the architect noted it, it matters — send it back to require fixes or file a ticket immediately. "Non-blocking observation" is a deferred fix that will never happen.
+**EM backlog responsibilities:**
+- At each validation gate, review the backlog. Bundle outstanding items into the next execution ticket if they touch the same code area.
+- When learnings steer away from a code path, prune its backlog items.
+- Before dispatching new work on a code area with outstanding backlog items, bundle the fixes first — don't build on top of known debt.
 
-**Note:** The same principle applies to spec reviews — report everything, don't hold back. The difference is framing: PR reviews classify all feedback as blocking; spec reviews classify by severity. Both mean "don't swallow feedback."
+**Note:** The same principle applies to spec reviews — report everything, don't hold back. Spec reviews classify by severity. Both mean "don't swallow feedback."
 
 **Post-merge regression check:** When a PR merges to a branch that received other PRs since the feature branch was created, the merge can silently drop code from those intermediate PRs during conflict resolution. The architect's PR diff review won't catch this — the dropped code was never in the PR's diff. After merging PRs that had merge conflicts, verify that recent features (merged since the branch point) still exist in the post-merge state. Include in architect dispatch: "If this PR had merge conflicts, check that recently merged features (since branch point) weren't dropped in conflict resolution."
 
@@ -230,8 +231,8 @@ For each issue (ONE AT A TIME):
 
 **Deliverable-driven workflow:**
 
-1. **Strategy doc → execution ticket.** Read the strategy doc for the track. File a single execution ticket for the next validation step. Scope to 3–4 hours, 4–5 agents max.
-2. **Parallel execution.** Break the ticket into parallel work items across non-overlapping file sets. Dispatch engineers simultaneously using worktrees if needed.
+1. **Strategy doc → execution tickets.** Read the strategy doc for the track. File execution tickets for the next validation step — one ticket per parallelizable work item, each sized to fit cleanly in one agent's context window.
+2. **Parallel execution.** Dispatch engineers simultaneously across non-overlapping file sets, using worktrees if needed. Each engineer owns one ticket.
 3. **PR review.** Each engineer creates a PR. EM dispatches architect to review:
    - If feedback: `sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>`
    - If approved: architect merges

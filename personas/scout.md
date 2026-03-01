@@ -65,7 +65,8 @@ A track-level document that defines the north star and the current best thinking
 Include:
 - **North star** — what success looks like for this track
 - **Representation / approach** — current best thinking on the method
-- **Validation ladder** — ordered steps, each producing something inspectable, with decision gates
+- **Current plan** — ordered next steps, open questions, decision gates (if the path is clear enough)
+- **Lessons learned** — things tried, what worked, what didn't, what steered the thinking
 - **Failure modes** — what each step failing would tell us
 
 ### Execution Ticket Spec (throwaway)

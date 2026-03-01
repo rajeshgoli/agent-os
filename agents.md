@@ -93,16 +93,17 @@ A track-level document that defines the north star for a line of work and the cu
 
 - Owned by the track, not a ticket
 - Updated after each deliverable based on what was learned
-- Contains the validation ladder (ordered steps, each producing something inspectable)
+- Contains current plan (ordered next steps, decision gates), lessons learned, and open questions
 - The spec for step N+1 is not written until step N validates
 
 **Examples:** `1840_dag_context_model.md`, a track's direction doc.
 
 ### Execution Ticket (throwaway)
 
-Picks the single next step from a strategy doc, hardens it into a tight spec via the review protocol, then drives parallel execution. Replaced after each iteration.
+Picks the next step from a strategy doc, hardens it into a tight spec via the review protocol, then drives parallel execution. Replaced after each iteration.
 
-- Scoped to one deliverable: **3–4 hours elapsed, 4–5 parallel agents max**
+- Scoped to one deliverable: **3–4 hours elapsed, up to 6 parallel agents**
+- A deliverable can have **sub-tickets** — each sized to fit cleanly in one agent's context window, each parallelizable
 - If it can't fit that cap, cut scope before starting
 - Must produce something the user can inspect and validate
 - Dies after delivery — the strategy doc is what persists
@@ -118,7 +119,7 @@ Picks the single next step from a strategy doc, hardens it into a tight spec via
 When writing an execution ticket spec:
 
 1. Converge on one approach: Considering alternatives is part of the thinking process, not the output. Evaluate tradeoffs during investigation and recommend one path in the spec.
-2. Scope check: Can the deliverable be completed within the 3–4 hour / 4–5 agent cap? If no, cut scope. Execution tickets are always single tickets — never epics. If the work is too large, the scope is wrong.
+2. Scope check: Can the deliverable be completed within the 3–4 hour / 6 agent cap? If no, cut scope. Each ticket should fit in one agent's context window. A deliverable can have multiple tickets for parallel execution.
 3. Ask if spec requires review. If it does, you'll be provided a reviewer friendly-name / ID. Use sm send to send the spec to the reviewer and request a review. Follow the review protocol below.
 
 When writing a strategy doc, the review protocol still applies, but there is no ticket classification step — strategy docs are living documents, not implementation specs.
@@ -198,11 +199,11 @@ The spec directory convention varies by project (e.g., `docs/working/`, `specs/`
 
 ### Filing Execution Tickets
 
-The strategy doc holds the validation ladder. After each step validates, EM files a single execution ticket for the next step. No upfront epic decomposition — the strategy doc is the roadmap.
+The strategy doc holds the current plan. After each step validates, EM files execution tickets for the next step. No upfront epic decomposition — the strategy doc is the roadmap.
 
-1. Reference the strategy doc at the top of the ticket and instruct agents to read it for context
-2. Scope to a single deliverable (3–4 hours, 4–5 agents max)
-3. If the deliverable has parallel work items, list them in the ticket body — but they are sub-tasks of one ticket, not separate tickets
+1. Reference the strategy doc at the top of each ticket and instruct agents to read it for context
+2. Scope the overall deliverable to 3–4 hours elapsed, up to 6 agents
+3. Each ticket should fit cleanly in one agent's context window. If a deliverable has parallel work items, file separate tickets — one per agent
 4. Mention the spec prominently at top and ask agents to read it before implementing or reviewing
 
 ### Ticket Hygiene
