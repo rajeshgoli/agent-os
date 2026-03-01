@@ -91,12 +91,13 @@ The system uses two distinct document types. Knowing which you're writing determ
 
 A track-level document that defines the north star for a line of work and the current best thinking on the path to get there. Revised after each validation gate. Never becomes a ticket. Never "implemented" — it steers.
 
+- Lives in `docs/product/` — this is how agents identify a strategy doc
 - Owned by the track, not a ticket
 - Updated after each deliverable based on what was learned
 - Contains current plan (ordered next steps, decision gates), lessons learned, and open questions
 - The spec for step N+1 is not written until step N validates
 
-**Examples:** `1840_dag_context_model.md`, a track's direction doc.
+**Examples:** `docs/product/1840_dag_context_model.md`, `docs/product/execution_philosophy.md`.
 
 ### Execution Ticket (throwaway)
 

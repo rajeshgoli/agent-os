@@ -60,7 +60,7 @@ Scout writes two types of documents. Know which you're writing — it determines
 
 ### Strategy Doc (living)
 
-A track-level document that defines the north star and the current best thinking on the path. Revised after each validation gate. Does not get ticket classification — it persists and steers.
+A track-level document that defines the north star and the current best thinking on the path. Revised after each validation gate. Does not get ticket classification — it persists and steers. Lives in `docs/product/`.
 
 Include:
 - **North star** — what success looks like for this track
