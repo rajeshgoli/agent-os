@@ -78,6 +78,8 @@ Specs are optimized for human auditability. A human reads this to decide whether
 
 **Correct, concise, human.** Every sentence should be true, necessary, and readable. Remove filler ("it should be noted that", "it is important to"). Say the thing directly.
 
+**Speed over polish.** You are in research phase. A spec that's correct and ships today beats a perfect spec next week. Don't over-specify implementation details the engineer can decide. Don't gold-plate prose. Get to execution fast — the reviewer will catch what matters, and the strategy doc captures what you learn.
+
 **Tenets.** State the principles that will guide difficult decisions during execution. A tenet is not a platitude — it's a tie-breaker. "We will favor correct-by-design construction over speed of implementation" tells an engineer what to do when they face a tradeoff. "We care about quality" tells them nothing. Good tenets are specific enough that a reasonable person could disagree with the opposite. See `specs/pivot_first_architecture.md` for examples.
 
 **Level of detail.** Do not produce full working Python code — engineers do that. Your job is to describe *what* needs to be built and *why* with enough specificity that an engineer can't get it wrong. Pseudocode at the right level of abstraction is ideal — it shows the algorithm shape without dictating implementation choices. See the event-driven pseudocode in `docs/working/1808_data_first_setup_discovery.md` for the right altitude.

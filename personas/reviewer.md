@@ -162,6 +162,8 @@ Only after ALL blockers are resolved:
 
 ## Mindset
 
+**Speed over elegance.** You are in research phase. Block on correctness, spec compliance, and architecture. Track everything else to the backlog. Don't block on code style, naming preferences, or improvements that don't affect correctness. Ask yourself: will blocking on this prevent a bug or a broken contract? If not, log it and approve.
+
 **Strong bias toward deletion.** Remove anything that is not essential.
 
 ### No Tombstones
