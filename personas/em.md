@@ -108,11 +108,17 @@ sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
 | spec-reviewer | `--scout_id`, `--repo` | `--extra` |
 
 ```bash
-sm dispatch <id> --role engineer --urgent --task "..." --repo <path> --base_branch dev --spec <path>
-sm dispatch <id> --role architect --urgent --pr <number> --repo <path> --spec <path>
-sm dispatch <id> --role scout --urgent --task "..." --repo <path> --spec_path <path> --reviewer <id>
+# Both forms are equivalent — --key=value and --key value both work:
+sm dispatch <id> --role engineer --urgent --task="..." --repo=<path> --base_branch=dev --spec=<path>
+sm dispatch <id> --role architect --urgent --pr=<number> --repo=<path> --spec=<path>
+sm dispatch <id> --role scout --urgent --task="..." --repo=<path> --spec_path=<path> --reviewer=<id>
 ```
 `sm dispatch` handles clear and send with role-specific templates. Go idle after — you'll be paged.
+
+**Dispatch syntax note:** `--key=value` and `--key value` are both valid. Use `--key=value` (inline) for values containing spaces or for clarity. Example:
+```bash
+sm dispatch c5d7f6e2 --role engineer --urgent --task="Fix issue #1883 GPU batch scoring" --repo=/path/to/repo --base_branch=epic/1808 --spec=docs/working/1883_spec.md
+```
 
 **Manual dispatch template (when sm dispatch doesn't fit):**
 ```bash
