@@ -41,6 +41,9 @@ git show <commit>
 | 6 | **Pattern consistency** | Does new code follow existing patterns in module? | ✓ Consistent / ✗ Diverges: <detail> |
 | 7 | **Frontend wiring** | New component/hook? Verify imported AND rendered in production code | ✓ Wired / ✗ NOT WIRED → BLOCK |
 | 8 | **Backend→frontend pipeline** | Backend→frontend data pipeline fully connected? | ✓ Complete / ✗ Gap: <detail> / N/A |
+| 9 | **Benchmark contract (if spec names one)** | Spec included a benchmark target? Verify final benchmark meets it. Output drift? Require **Accepted Risk** section with quantified tolerance. | ✓ Meets target / ✗ BLOCK — benchmark missing or fails / N/A |
+
+**Project-specific gates:** Apply validation gates from the repo's `CLAUDE.md` or `AGENTS.md` in addition to this checklist.
 
 **For check #7 (Frontend wiring), run:**
 ```bash
@@ -80,27 +83,13 @@ Ask: **"If I click this / call this / use this, will it actually work?"**
 
 ## Issue Triage
 
-Every issue you notice must be reported — nothing gets swallowed. Classify:
+Use 3 buckets only:
 
-### Blockers (fix before merge)
-
-| Issue Type | Action |
-|------------|--------|
-| Correctness bugs | BLOCK |
-| Spec non-compliance | BLOCK |
-| Architectural issues (broken state machine, wrong abstraction, missing wiring) | BLOCK |
-| Data integrity / anti-lookahead violations | BLOCK |
-
-### Tracked items (log to deliverable backlog)
-
-| Issue Type | Action |
-|------------|--------|
-| Code quality (duplication, unnecessary allocations, dead params) | Log to backlog |
-| Would require >30 min refactor | Log to backlog |
-| Pattern improvements that don't affect correctness | Log to backlog |
-| Truly cosmetic (whitespace, trailing comma) | Can leave — don't even log |
-
-Tracked items go into the execution doc's backlog section. The orchestrator manages the lifecycle.
+| Bucket | Use When | Action |
+|--------|----------|--------|
+| **BLOCK NOW** | Fix is incomplete, spec is not met, correctness is at risk, or benchmark contract fails | Block merge |
+| **FIX BEFORE EPIC SHIPS** | Doesn't block immediate functionality, but could lead to silent failure later, correctness risk later, or material perf loss | Ship feature, then drain in immediate follow-up PR |
+| **OTHER FIX CANDIDATES** | Could improve code or feature quality, but not worth holding or mandatory immediate drain | Drop or bundle; nothing dangles after epic ship |
 
 ---
 
@@ -136,8 +125,11 @@ Your review MUST include these sections. Missing sections = incomplete review.
 **Blockers (if any):**
 1. <specific issue>
 
-**Tracked (logged to backlog):**
-1. <issue> — logged for bundling before next deliverable
+**Fix Before Epic Ships:**
+1. <specific issue>
+
+**Other Fix Candidates:**
+1. <specific issue>
 ```
 
 ---

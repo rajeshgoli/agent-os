@@ -49,6 +49,8 @@ sm dispatch <id> --role engineer --urgent --task "..."
 | Assume agent "died" without checking | Kills in-progress work | Always `sm children` to verify state |
 | Act on stop hook notifications | Stop hooks are often stale or duplicates; agent may be in a review loop | Only act on explicit `sm send` from agents |
 | Clear an agent based on short stop message | "Standing by" may mean agent is waiting for `sm send` from reviewer | Check if work product exists before clearing |
+| Kill/remove without checking worktree state | Loses unpushed commits, destroys in-progress work | `sm tail` + `git log origin/<branch>..HEAD` + `git status` before every kill/remove |
+| Remove worktree while CWD points to it | Bricks all subsequent commands, requires user intervention | `pwd` check before `git worktree remove` — CWD must NOT match target |
 
 ---
 
@@ -171,17 +173,12 @@ You wake via:
 ## Architect Dispatch Rules
 
 **Always include in architect PR dispatches:**
-- "Catch everything. Block on correctness/spec/architecture issues. Log code quality and improvement items to the deliverable backlog."
-- "Do NOT write code. Post comments for engineer to fix blockers."
+- "Catch everything. Classify findings as BLOCK NOW, FIX BEFORE EPIC SHIPS, or OTHER FIX CANDIDATES. Do NOT write code. Post comments for engineer to fix blockers."
 
-Architects review and comment. Engineers fix blockers. Non-blockers get logged to backlog.
-
-**EM backlog responsibilities:**
-- At each validation gate, review the backlog. Bundle outstanding items into the next execution ticket if they touch the same code area.
-- When learnings steer away from a code path, prune its backlog items.
-- Before dispatching new work on a code area with outstanding backlog items, bundle the fixes first — don't build on top of known debt.
-
-**Note:** The same principle applies to spec reviews — report everything, don't hold back. Spec reviews classify by severity. Both mean "don't swallow feedback."
+**EM follow-up responsibilities:**
+- After epic ship, group `FIX BEFORE EPIC SHIPS` items into logical bundles and dispatch an immediate drain PR.
+- Do not leave hanging backlog inventory.
+- Drop or bundle `OTHER FIX CANDIDATES`; they are not standing debt by default.
 
 **Post-merge regression check:** When a PR merges to a branch that received other PRs since the feature branch was created, the merge can silently drop code from those intermediate PRs during conflict resolution. The architect's PR diff review won't catch this — the dropped code was never in the PR's diff. After merging PRs that had merge conflicts, verify that recent features (merged since the branch point) still exist in the post-merge state. Include in architect dispatch: "If this PR had merge conflicts, check that recently merged features (since branch point) weren't dropped in conflict resolution."
 
@@ -231,25 +228,18 @@ For each issue (ONE AT A TIME):
 
 **Deliverable-driven workflow:**
 
+- **Hot-loop semantics:** For working docs that introduce or change long-running data-processing commands, do not dispatch full implementation until the spec names a Benchmark Contract and a prototype has been run against it. If the prototype misses, update the spec first.
+
 1. **Strategy doc → execution tickets.** Read the strategy doc for the track. File execution tickets for the next validation step — one ticket per parallelizable work item, each sized to fit cleanly in one agent's context window.
 2. **Parallel execution.** Dispatch engineers simultaneously across non-overlapping file sets, using worktrees if needed. Each engineer owns one ticket.
 3. **PR review.** Each engineer creates a PR. EM dispatches architect to review:
    - If feedback: `sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>`
    - If approved: architect merges
 4. **Validation gate.** After all work items merge, present findings to the user. Summarize what was built, what was learned, and what the strategy doc says the next step is. **Wait for user steer before filing the next execution ticket.** Do NOT auto-proceed.
-5. **Backlog review.** At the validation gate, review the deliverable backlog (items architects logged as non-blocking). Bundle items that touch the same code area as the next deliverable into its execution tickets. Prune items whose code path is abandoned by new learnings. Dead backlog is noise — delete it.
+5. **Fix-candidate drain.** After the feature/epic ships, group `FIX BEFORE EPIC SHIPS` items into logical bundles and dispatch an immediate follow-up PR. Drop or bundle `OTHER FIX CANDIDATES`; do not leave them dangling.
 6. **Update strategy doc.** Based on findings and user steer, update the strategy doc if needed.
 
 **The validation gate is the core serialization point.** Within a deliverable, maximize parallelism. Across deliverables, serialize on user review. The user decides whether to continue, steer, or stop.
-
-### Backlog Management
-
-Architect PR reviews produce two outputs: blockers (engineer fixes before merge) and tracked items (logged to backlog). EM owns the backlog lifecycle:
-
-- **Where it lives:** `## Backlog` section in the strategy doc, or a standalone file if no strategy doc exists.
-- **When to bundle:** Before dispatching new work on a code area with outstanding backlog items, fold those items into the execution tickets. Don't build on top of known debt.
-- **When to prune:** When learnings steer away from a code path, delete its backlog items. When a backlog item is no longer relevant after a validation gate, delete it.
-- **When to escalate:** If backlog items accumulate faster than they're bundled, surface this to the user at the validation gate — it may indicate scope or quality issues.
 
 ---
 
@@ -302,6 +292,8 @@ Pause and alert human when:
 ---
 
 ## Continuous Improvement
+
+Workflow/process changes to `agent-os` are proposed via issue/retro and land only through owner-reviewed PRs. Do not edit persona files ad hoc from project work.
 
 EM is responsible for making the EM workflow better for future agents. As you work, notice friction — things that waste tokens, require workarounds, or cause repeated nudging.
 
