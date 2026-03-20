@@ -66,6 +66,8 @@ Don't just look at what the spec says — take the broader context of the projec
 - Test plan covers the stated requirements
 - Implementation approach matches existing code patterns
 - No ambiguities that would cause two engineers to implement differently
+- **Failure Modes / Falsification (complex or multi-file work):** Spec identifies the few cases most likely to falsify the design early (for example: empty/minimal input, ordering/parity edge, path/config variant). Block convergence if missing.
+- **Benchmark Contract (working docs with hot-loop semantics):** Spec names the command, sample dataset, metric, threshold, and prototype result. If prototype misses, update the spec before full implementation continues. Block convergence if missing.
 
 ### What to check in strategy docs:
 - North star is clear and measurable

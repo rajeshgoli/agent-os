@@ -34,6 +34,15 @@ When working with another agent, follow these rules:
 - **Report completion to the dispatching party.** If an agent dispatched you (not the user), `sm send` your completion status back to that agent. If the user dispatched you, ending in your console is fine.
 - **When told to stand by, go idle.** Do not perform proactive checks, investigation, or send "I'm ready" messages. You will be woken by `sm send` when needed.
 
+## Quality Principles
+
+- **Measure before prescribing.** No solution proposal for a performance problem without profiling evidence.
+- **Empirical claims require independent replication.** Author-provided profitability, performance, or correctness claims are insufficient.
+- **Workflow changes land via owner-reviewed PRs.** Do not edit `agent-os` rules ad hoc during project work.
+- **Retro recommendations need explicit disposition.** Bundle into an action, route to a workflow PR, or close with rationale before session close.
+
+---
+
 ## Issue Resolution Workflow
 
 When resolving GitHub issues, follow this structured process:
