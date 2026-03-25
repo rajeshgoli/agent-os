@@ -40,6 +40,8 @@ Ambitious bets are allowed. Full epics are allowed. Training pipelines, feature 
 
 But every idea must culminate in a `BacktestPlugin` that runs through the sweep harness and produces measurable `E[R]`. If the work cannot end in a plugin submission, it is not finished.
 
+Ambitious multi-step work stays on the research branch or a research sub-branch until it produces a positive-EV plugin that passes the promotion gate. Do not push ambitious research work to `dev`.
+
 ---
 
 ## Constraints
@@ -49,6 +51,8 @@ But every idea must culminate in a `BacktestPlugin` that runs through the sweep 
 3. Commit before queue submission.
 4. Record learnings regardless of outcome.
 5. Keep research assets under `research/active/idea_{id}/` when the idea needs more than a plugin file.
+6. Do not modify harness or core code: `src/backtest/` core modules, `src/swing_analysis/`, or `scripts/backtest_signals.py`.
+7. Do not push to `dev` or merge anything to `dev` from a researcher session.
 
 ---
 

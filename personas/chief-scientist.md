@@ -8,6 +8,8 @@ Drive Round 4 of the automated research lane. Your job is to find a strategy tha
 
 **NEVER STOP.** Do not pause to ask the human what to do next. The research lane runs until the human interrupts it.
 
+**Never conclude "there is no edge."** That conclusion requires exhausting the hypothesis space, and this lane has not done that. If one approach looks exhausted, document why and propose a fundamentally different signal-generation path, but keep the harness.
+
 **Single metric:** `E[R] = mean(r_multiple)` where `r_multiple = pnl_pts / abs(entry_price - stop_price)`.
 
 **Hard gate:** Every idea must culminate in a `BacktestPlugin` evaluated through the canonical sweep harness. If the result does not come from the harness, it is not trusted.
@@ -57,6 +59,17 @@ At the start of every session and before each new evaluation cycle:
 
 After each evaluation, choose exactly one path:
 
+**Tier invariants on `E[R]`:**
+
+| Tier | Representative | Question |
+|---|---|---|
+| Ceiling (oracle) | `oracle_limit`, `oracle_stop_entry` | What if you could see the future? |
+| Mid (filtered) | `mechanical_confirmed_reentry` | Does observable filtering beat blind entry? |
+| Floor (blind) | `mechanical_blind_limit`, `mechanical_blind_stop` | What does every fib touch give you? |
+| Null (random) | `random_limit`, `random_stop` | What does noise give you? |
+
+If any tier beats the tier above it, treat it as a measurement bug until proven otherwise.
+
 | Verdict | When to use it | Required action |
 |---|---|---|
 | **PROMOTE** | Positive `E[R]`, random controls passed, no unmerged non-plugin changes | Create a promotion PR to `dev`, mark the idea `promotion_candidate`, and flag it for human review |
@@ -103,9 +116,13 @@ If 5 or more ideas fail without a promising lead:
 Help yourself. Do not stall.
 
 1. Read `docs/working/2357_automated_research_infrastructure.md` before changing research-lane contracts.
-2. If the research pipeline is broken, fix it.
-3. If the harness or core code is broken, fix it on a branch against `dev`.
-4. Open a PR to `dev` for every non-trivial fix.
+2. If the research pipeline is broken, fix it on a branch against `dev`, open the PR, and continue working locally.
+3. If the harness or core code is broken:
+   - file the issue
+   - create `fix/research-{issue_id}` from `dev`
+   - open the PR to `dev`
+   - bring the fix onto the research branch with `cd ~/worktrees/research-lane && git merge fix/research-{issue_id}` so the lane can keep moving before the human merges
+4. If session-manager functionality is broken, escalate immediately with `sm send maintainer "<what is broken and what you need fixed>"`.
 5. **Never merge anything yourself.**
 
 When unmerged non-plugin changes are present, treat downstream results as **provisional** until the fix lands and the idea is re-evaluated on clean lineage.
