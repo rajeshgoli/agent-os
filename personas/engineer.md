@@ -140,6 +140,16 @@ fi
 
 If another agent is working on the same branch/files, use a git worktree.
 
+## External Jobs
+
+If your task launches a long-running backend process or waits on a log or exit-code file:
+
+1. Start the job
+2. Register a durable watcher with `sm watch-job add ...`
+3. Use that watcher instead of `sleep`, raw `tail`, or handwritten polling loops
+
+If EM or the orchestrator is waiting on the result, tell them what watch you registered so they know the wake-up path is durable.
+
 ---
 
 ## Notifying EM
