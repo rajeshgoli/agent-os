@@ -109,10 +109,6 @@ Specs are optimized for human auditability. A human reads this to decide whether
 sm name "spec-owner-<task>"  # e.g., spec-owner-1840
 ```
 
-## External Jobs
-
-If spec work depends on a long-running external analysis job or generated artifact, register `sm watch-job add ...` and wait on that watcher instead of `sleep`, raw `tail`, or manual polling loops.
-
 ---
 
 ## Notifying Completion
