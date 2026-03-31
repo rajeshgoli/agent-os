@@ -180,34 +180,46 @@ Only after ALL checks pass:
 
 ---
 
-## Fix It Now (CRITICAL)
+## Issue Triage (CRITICAL)
 
-**Agents have no memory. "Fix later" = never fixed.**
+**Catch everything. Ship blockers. Track the rest.**
 
-Humans can revisit code opportunistically and fix things they notice. Agents cannot. When you see an issue during review, **fix it now** unless it's truly cosmetic.
+Every issue you notice during review must be reported — nothing gets swallowed. But not everything blocks the current PR. The distinction:
+
+### Blockers (fix before merge)
 
 | Issue Type | Action |
 |------------|--------|
-| Blocking / Critical | MUST fix now |
-| Important / Non-trivial | MUST fix now |
-| Code quality (duplication, unnecessary allocations, dead params) | MUST fix now — these are not minor |
-| Would require >30 min refactor | Create ticket with `TODO:` prefix, but prefer fixing now if possible |
-| Truly cosmetic (whitespace, trailing comma) | Can leave |
+| Correctness bugs | BLOCK — fix now |
+| Spec non-compliance | BLOCK — fix now |
+| Architectural issues (broken state machine, wrong abstraction, missing wiring) | BLOCK — fix now |
+| Data integrity / anti-lookahead violations | BLOCK — fix now |
 
-**Default to fixing now.** The bar for deferral is high. "Truly cosmetic" means formatting only — if it affects runtime behavior, readability, or maintainability, it's not cosmetic.
+### Tracked items (log to deliverable backlog)
+
+| Issue Type | Action |
+|------------|--------|
+| Code quality (duplication, unnecessary allocations, dead params) | Log to backlog |
+| Would require >30 min refactor | Log to backlog |
+| Pattern improvements that don't affect correctness | Log to backlog |
+| Truly cosmetic (whitespace, trailing comma) | Can leave — don't even log |
+
+**Backlog lifecycle:**
+- Tracked items go into a `## Backlog` section in the strategy doc (or a standalone backlog file if no strategy doc exists)
+- **Before building new things on the same code area,** bundle outstanding backlog items into the next execution ticket. Don't build on top of known debt.
+- **When learnings steer away** from a code path, delete its backlog items. Dead backlog is noise.
+- EM is responsible for reviewing the backlog at each validation gate and deciding what to bundle, what to prune.
 
 **Bad patterns:**
-- "This can be addressed opportunistically" → NO, fix now
-- "Note for the future" → NO, fix now or create blocking ticket
-- "Minor, can be fixed in follow-up" → If it's worth mentioning, fix it now
-- "Non-blocking observation" → NO. This category does not exist. Block or say nothing.
-- "Two non-blocking items noted" → NO. If you noted them, they matter. Block on them.
+- "Non-blocking observation" with no tracking → NO. If you noticed it, log it.
+- "Fix later" with no mechanism → NO. Log to backlog or block.
+- Swallowing feedback because it's "minor" → NO. Catch everything.
 
 **Good patterns:**
-- "Must fix before merge: <specific issue>"
-- "BLOCKED until <issue> resolved"
+- "BLOCKED: <specific issue that must be fixed before merge>"
+- "Tracked: <issue> — logged to backlog for bundling before next deliverable"
 - "Approved — no issues" (if truly clean)
-- "Approved — only cosmetic: trailing whitespace on line 42" (formatting only)
+- "Approved — 2 items logged to backlog: <brief summary>"
 
 ---
 
@@ -255,7 +267,7 @@ sm name "architect-<task>"  # e.g., architect-pr1068
 
 - Run tests
 - Implement code (that's Engineer)
-- Defer issues for "later" (agents have no memory)
+- Swallow issues — everything gets reported (blocked or tracked)
 - Accept documentation as implementation ("guide created" ≠ done)
 - Approve without completing ALL checklist items
 - Skip functional verification for UI changes

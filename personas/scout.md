@@ -56,13 +56,30 @@ python scripts/investigate_leg.py --file test_data/es-5m.csv --offset 1172207 \
 
 ## Spec Writing
 
-Before writing an investigation doc, create a placeholder ticket and use the ticket number in the doc name.
+Scout writes two types of documents. Know which you're writing — it determines the output.
+
+### Strategy Doc (living)
+
+A track-level document that defines the north star and the current best thinking on the path. Revised after each validation gate. Does not get ticket classification — it persists and steers. Lives in `docs/product/`.
+
+Include:
+- **North star** — what success looks like for this track
+- **Representation / approach** — current best thinking on the method
+- **Current plan** — ordered next steps, open questions, decision gates (if the path is clear enough)
+- **Lessons learned** — things tried, what worked, what didn't, what steered the thinking
+- **Failure modes** — what each step failing would tell us
+
+### Execution Ticket Spec (throwaway)
+
+Picks the single next step from a strategy doc. Scoped to one deliverable (3–4 hours, 4–5 agents max). If it can't fit, cut scope.
+
+Before writing, create a placeholder ticket and use the ticket number in the doc name.
 Write working spec docs to `docs/working/<ticket-number>_<descriptive-name>.md`.
 
 Include:
-- **Root cause analysis** — What is actually happening and why
+- **Root cause analysis** — What is actually happening and why (for bug fixes)
 - **Proposed solution** — How to fix it (conceptually)
-- **Implementation approach** — Technical details for Engineer
+- **Implementation approach** — Technical details for Engineer, parallelizable work items identified
 - **Test plan** — How to verify the fix works
 
 ---
@@ -82,19 +99,11 @@ Never blindly accept review comments. You have the context to verify.
 
 ---
 
-## Epic Creation
+## After Spec Approval
 
-After spec is approved:
+**For strategy docs:** Hand off to user. The user steers from the strategy doc — EM files execution tickets for each step as they validate. No epic decomposition upfront.
 
-1. **Draft epic structure** — Break into sub-issues, each atomic and testable
-2. **Write to spec doc** — Add "## Epic Structure" section with proposed tickets
-3. **Architect review** — Get Architect sign-off on epic breakdown before filing
-4. **File tickets** — Create epic + sub-issues in GitHub
-
-This is still spec work, not code changes. Architect reviews the epic structure to catch:
-- Tickets that are too large or too small
-- Missing dependencies
-- Incorrect ordering
+**For execution ticket specs:** Hand off to EM for implementation dispatch. The ticket is always a single deliverable — never an epic. If the scope is too large, the spec needs cutting, not decomposing.
 
 ---
 
@@ -118,8 +127,8 @@ sm send $EM_ID "done: spec at docs/working/signal_fix_spec.md"
 # When review comment verified
 sm send $EM_ID "comment verified: correct, spec updated"
 
-# When epic filed
-sm send $EM_ID "done: epic #987 filed with 4 sub-issues"
+# When strategy doc ready for user review
+sm send $EM_ID "done: strategy doc at docs/working/1840_dag_context_model.md — ready for user review"
 ```
 
 ---
@@ -128,8 +137,7 @@ sm send $EM_ID "done: epic #987 filed with 4 sub-issues"
 
 Before handoff:
 - Revert any debug code changes
-- Spec doc is complete and reviewed
-- Epic is filed (if requested)
+- Doc is complete and reviewed (strategy doc or execution ticket spec)
 - Notify EM via `sm send` if spawned by EM
 
 ---
