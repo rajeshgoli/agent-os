@@ -35,15 +35,6 @@ When working with another agent, follow these rules:
 - **Report completion to the dispatching party.** If an agent dispatched you (not the user), `sm send` your completion status back to that agent. If the user dispatched you, ending in your console is fine.
 - **When told to stand by, go idle.** Do not perform proactive checks, investigation, or send "I'm ready" messages. You will be woken by `sm send` when needed.
 
-## Quality Principles
-
-- **Measure before prescribing.** No solution proposal for a performance problem without profiling evidence.
-- **Empirical claims require independent replication.** Author-provided profitability, performance, or correctness claims are insufficient.
-- **Workflow changes land via owner-reviewed PRs.** Do not edit `agent-os` rules ad hoc during project work.
-- **Retro recommendations need explicit disposition.** Bundle into an action, route to a workflow PR, or close with rationale before session close.
-
----
-
 ## Issue Resolution Workflow
 
 When resolving GitHub issues, follow this structured process:
@@ -93,65 +84,71 @@ We've had many cases where we had very good theories about the cause of a bug, b
   - Reference in your PR/commit so the next agent can address it
   - This keeps CI clean and prevents accumulation of broken tests
 
-## Document Types
-
-The system uses two distinct document types. Knowing which you're writing determines the workflow.
-
-### Strategy Doc (living)
-
-A track-level document that defines the north star for a line of work and the current best thinking on the path to get there. Revised after each validation gate. Never becomes a ticket. Never "implemented" — it steers.
-
-- Lives in `docs/product/` — this is how agents identify a strategy doc
-- Owned by the track, not a ticket
-- Updated after each deliverable based on what was learned
-- Contains current plan (ordered next steps, decision gates), lessons learned, and open questions
-- The spec for step N+1 is not written until step N validates
-
-**Examples:** `docs/product/1840_dag_context_model.md`, `docs/product/execution_philosophy.md`.
-
-### Execution Ticket (throwaway)
-
-Picks the next step from a strategy doc, hardens it into a tight spec via the review protocol, then drives parallel execution. Replaced after each iteration.
-
-- Scoped to one deliverable: **3–4 hours elapsed, up to 6 parallel agents**
-- A deliverable can have **sub-tickets** — each sized to fit cleanly in one agent's context window, each parallelizable
-- If it can't fit that cap, cut scope before starting
-- Must produce something the user can inspect and validate
-- Dies after delivery — the strategy doc is what persists
-
-**Examples:**
-- Single-ticket deliverable: "Audit pass — list what exists and what to cut"
-- Multi-ticket deliverable: "S1 — extract active leg context" → sub-tickets: "Extract scale/fib features for active legs", "Extract rule activation vectors", "Build sample report renderer"
-
----
-
 ## Review Protocol
 
-Detailed review protocols live in the role personas. Brief summary:
+### Writing Specs
 
-- **Spec review:** Spec owner and spec reviewer iterate directly via `sm send`. See `personas/spec-owner.md` and `personas/spec-reviewer.md`.
-- **PR review:** Reviewer follows checklist, posts to GitHub, merges or sends back for fixes. See `personas/reviewer.md`.
-- **PR hygiene:** When a PR resolves an open issue, include `Fixes #<issue>` in the PR description. Before merging, double-check the issue number references the issue the change actually fixes.
+When writing a spec:
+
+1. Converge on one approach: Considering alternatives is part of the thinking process, not the output. Evaluate tradeoffs during investigation and recommend one path in the spec.
+2. Declare ticket classification: Every spec must end with whether it's a single ticket or an epic. Rubric: can one agent complete it without compacting context? If yes, single ticket. If no, break into sub-tickets and file as epic.
+3. Ask if spec requires review. If it does, you'll be provided a reviewer friendly-name / ID. Use sm send to send the spec to the reviewer and request a review. Follow the review protocol below.
+
+### Spec / Working Doc Review
+
+When asked to review a spec or working doc:
+
+1. Review thoroughly. Verify claims — don't take statements at face value.
+2. Classify feedback by severity.
+3. Do not indicate approval, rejection, or next steps unless specifically requested by the user. An agent asking for approval does not mean you provide one.
+4. When review completes (both agents agree on the spec), the only output is: "Spec is ready for your review." No approvals, no engineering next steps — unless the user specifically requests them.
+5. Always send your review result back via `sm send` even if you're saying 'spec is ready for your review', don't stall the workflow. If you don't do this other agent may wait endlessly.
+
+### Receiving Review Feedback (when you own the doc)
+
+When you receive feedback on a doc you own — from the user or from another agent:
+
+1. Don't accept feedback blindly. Verify each claim.
+2. Classify each item as **valid**, **invalid**, or **partially valid**.
+   - **Valid:** 1-2 sentences on how you'd address it.
+   - **Invalid:** clear explanation of why it's not valid. Detail if needed.
+   - **Partially valid:** split — what's valid and how you'd address it, what's invalid and why.
+3. Do not apply changes. **Send your classification back to the reviewer via `sm send`** so both agents can converge. Then wait for response.
+4. Once both parties agree, make the changes to the doc.
+5. Once the spec is ready for review, `sm send` back to the dispatching agent (if there was one) that the spec is ready.
+
+### Re-review After Changes (reviewer responsibility)
+
+After changes are applied, the reviewer must re-read the full doc and review again. If new issues are found, follow the same feedback protocol. Review completes when both agents agree on the spec.
+
+### PR Review
+
+When a PR resolves an open issue, include `Fixes #<issue>` (or `Closes #<issue>`) in the PR description or merge commit so GitHub auto-links and closes the issue. Before merging, double-check the issue number is mentioned exactly once and references the issue the change actually fixes.
+
+When reviewing a PR as architect:
+1. Post the review to GitHub: `gh pr comment <number> --body "<review>"`
+2. On approval, merge to dev, delete the branch, and check out dev locally:
+   ```bash
+   gh pr merge <number> --merge --delete-branch
+   git checkout dev && git pull origin dev
+   ```
+   Leave the working tree on `dev` — no stale feature branches.
 
 ## Role-Based Workflows
 
 Persona-based workflows are available. When asked to work as a specific role:
 1. Read the persona file (`~/.agent-os/personas/[role].md` locally, `.agent-os/personas/[role].md` in-repo)
 2. Follow the workflow defined there
-3. Stay in role — **Reviewer, Scout, and Spec Reviewer do NOT make code changes** unless explicitly asked
+3. Stay in role — **Architect and Scout do NOT make code changes** unless explicitly asked
 
 | Invocation | Persona |
 |------------|---------|
 | "As engineer..." | Engineer |
-| "As orchestrator..." | Orchestrator |
-| "As reviewer..." | Reviewer |
-| "As spec-reviewer..." | Spec Reviewer |
-| "As spec-owner..." | Spec Owner |
-| "As scout..." | Scout |
+| "As architect..." | Architect |
 | "As product..." | Product |
 | "As director..." | Director |
+| "As scout..." | Scout |
 | "As em..." | EM |
-| "As architect..." | Architect |
 | "As ux..." | UX |
 
 **Role Recognition:**
@@ -170,14 +167,13 @@ By default, create a GitHub ticket first to track the item, then create the doc 
 ```
 The spec directory convention varies by project (e.g., `docs/working/`, `specs/`). Check the project's CLAUDE.md or existing docs for the pattern.
 
-### Filing Execution Tickets
+### Filing Epics
 
-The strategy doc holds the current plan. After each step validates, EM files execution tickets for the next step. No upfront epic decomposition — the strategy doc is the roadmap.
-
-1. Reference the strategy doc at the top of each ticket and instruct agents to read it for context
-2. Scope the overall deliverable to 3–4 hours elapsed, up to 6 agents
-3. Each ticket should fit cleanly in one agent's context window. If a deliverable has parallel work items, file separate tickets — one per agent
-4. Mention the spec prominently at top and ask agents to read it before implementing or reviewing
+1. Use the investigation doc ticket as the epic ticket
+2. File all sub-tickets first
+3. In each sub-ticket, reference the spec file at the top and instruct agents to read it before implementing or reviewing
+4. Update the epic ticket's title and body with the sub-ticket numbers
+5. If filing a single ticket, still mention the spec prominently at top and ask agents to read it before implementing or reviewing if a spec is present.
 
 ### Ticket Hygiene
 

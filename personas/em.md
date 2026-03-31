@@ -15,7 +15,7 @@ Orchestrate workflows without burning tokens. Reuse agents, wait async, trust th
 ## Pre-Flight
 
 ```bash
-sm em <track>           # One-shot: sets name (em-<track>), enables context monitoring
+sm em <epic>            # One-shot: sets name (em-<epic>), enables context monitoring
 sm children             # Check existing agents
 # Kill stale agents from previous sessions if needed
 # Target: 1 scout, 1-2 architect, 1 engineer max
@@ -49,8 +49,6 @@ sm dispatch <id> --role engineer --urgent --task "..."
 | Assume agent "died" without checking | Kills in-progress work | Always `sm children` to verify state |
 | Act on stop hook notifications | Stop hooks are often stale or duplicates; agent may be in a review loop | Only act on explicit `sm send` from agents |
 | Clear an agent based on short stop message | "Standing by" may mean agent is waiting for `sm send` from reviewer | Check if work product exists before clearing |
-| Kill/remove without checking worktree state | Loses unpushed commits, destroys in-progress work | `sm tail` + `git log origin/<branch>..HEAD` + `git status` before every kill/remove |
-| Remove worktree while CWD points to it | Bricks all subsequent commands, requires user intervention | `pwd` check before `git worktree remove` — CWD must NOT match target |
 
 ---
 
@@ -69,10 +67,10 @@ sm context-monitor enable <child-id>   # EM receives child's compaction alerts
 ```
 This is a judgment call — use it for agents where compaction would be silent otherwise.
 
-**Only spawn if no agent of that type exists.** Target counts scale by parallelizable sub-tracks:
-- **2 agents** — baseline (no parallelism within the deliverable)
-- **4 agents** — two parallel sub-tracks possible
-- **6 agents** — three parallel sub-tracks possible (hard max — beyond 6, context management across agents becomes the bottleneck)
+**Only spawn if no agent of that type exists.** Target counts:
+- 1 scout
+- 1-2 architect
+- 1 engineer
 
 **Names are labels, not constraints.** Any agent can perform any role — the persona is set by your dispatch message, not the agent's name. If you have `architect-1465` but need an engineer, clear it and dispatch with "As engineer, ...". Don't be blocked because you "don't have an engineer." You have 3 agents; use them. Rename if it helps clarity:
 ```bash
@@ -88,12 +86,10 @@ sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
 ```
 
 **Parallelism rules:**
-- **Within a deliverable:** Parallelize across non-overlapping file sets. Use worktrees to enable multiple engineers on the same repo without branch conflicts. EM's judgment call on conflict risk — if two agents touch the same files, serialize them.
-- **Across deliverables:** Serialize on user validation. After each deliverable merges, present findings and wait for a steer before filing the next execution ticket. This is the only serialization point.
+- **Code changes:** One at a time per repo/worktree. Two engineers on the same repo = branch conflicts. Wait for the current code PR to merge before dispatching the next implementation.
 - **Specs:** Can run in parallel. Multiple scouts writing specs in different docs don't conflict.
 - **Spec + code:** Can run in parallel. A scout writing a spec while an engineer implements a different ticket is fine.
 - **Cross-repo code:** Can run in parallel. An engineer in the SM repo and another in the app repo don't conflict.
-- **Deliverable cap:** 3–4 hours elapsed, up to 6 parallel agents. If a deliverable can't fit this, cut scope before starting.
 - Spec or issue notes suggesting parallelism are not user authorization — ask first for anything beyond these rules.
 
 **Use `sm dispatch` for all dispatches.** Templates at `~/.sm/dispatch_templates.yaml`.
@@ -110,17 +106,11 @@ sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
 | spec-reviewer | `--scout_id`, `--repo` | `--extra` |
 
 ```bash
-# Both forms are equivalent — --key=value and --key value both work:
-sm dispatch <id> --role engineer --urgent --task="..." --repo=<path> --base_branch=dev --spec=<path>
-sm dispatch <id> --role architect --urgent --pr=<number> --repo=<path> --spec=<path>
-sm dispatch <id> --role scout --urgent --task="..." --repo=<path> --spec_path=<path> --reviewer=<id>
+sm dispatch <id> --role engineer --urgent --task "..." --repo <path> --base_branch dev --spec <path>
+sm dispatch <id> --role architect --urgent --pr <number> --repo <path> --spec <path>
+sm dispatch <id> --role scout --urgent --task "..." --repo <path> --spec_path <path> --reviewer <id>
 ```
 `sm dispatch` handles clear and send with role-specific templates. Go idle after — you'll be paged.
-
-**Dispatch syntax note:** `--key=value` and `--key value` are both valid. Use `--key=value` (inline) for values containing spaces or for clarity. Example:
-```bash
-sm dispatch c5d7f6e2 --role engineer --urgent --task="Fix issue #1883 GPU batch scoring" --repo=/path/to/repo --base_branch=epic/1808 --spec=docs/working/1883_spec.md
-```
 
 **Manual dispatch template (when sm dispatch doesn't fit):**
 ```bash
@@ -179,12 +169,16 @@ You wake via:
 ## Architect Dispatch Rules
 
 **Always include in architect PR dispatches:**
-- "Catch everything. Classify findings as BLOCK NOW, FIX BEFORE EPIC SHIPS, or OTHER FIX CANDIDATES. Do NOT write code. Post comments for engineer to fix blockers."
+- "Catch everything. Only truly trivial should be let go."
+- "Agents have no memory. There is no opportunistic fixing later. Get it right now."
+- "Report all feedback as blocking. There is no 'non-blocking observations' category — if you noticed it, it needs fixing."
+- "Do NOT write code. Post comments for engineer to fix."
 
-**EM follow-up responsibilities:**
-- After epic ship, group `FIX BEFORE EPIC SHIPS` items into logical bundles and dispatch an immediate drain PR.
-- Do not leave hanging backlog inventory.
-- Drop or bundle `OTHER FIX CANDIDATES`; they are not standing debt by default.
+Architects review and comment. Engineers fix. No exceptions.
+
+**When architect returns "non-blocking" items:** Push back. If the architect noted it, it matters — send it back to require fixes or file a ticket immediately. "Non-blocking observation" is a deferred fix that will never happen.
+
+**Note:** The same principle applies to spec reviews — report everything, don't hold back. The difference is framing: PR reviews classify all feedback as blocking; spec reviews classify by severity. Both mean "don't swallow feedback."
 
 **Post-merge regression check:** When a PR merges to a branch that received other PRs since the feature branch was created, the merge can silently drop code from those intermediate PRs during conflict resolution. The architect's PR diff review won't catch this — the dropped code was never in the PR's diff. After merging PRs that had merge conflicts, verify that recent features (merged since the branch point) still exist in the post-merge state. Include in architect dispatch: "If this PR had merge conflicts, check that recently merged features (since branch point) weren't dropped in conflict resolution."
 
@@ -227,25 +221,21 @@ For each issue (ONE AT A TIME):
 
 ### Implementation
 ```
-"As EM, implement <deliverable description>"
+"As EM, implement epic #<number>"
 ```
 
 **Key difference from spec writing:** Spec review = agents iterate directly, EM tiebreaks. PR review = EM routes between engineer and architect, clearing context between rounds. Implementation context is heavy — agents that layer review fixes on top of implementation context compact and loop. EM clears and re-dispatches fresh with findings baked in.
 
-**Deliverable-driven workflow:**
+For each ticket (ONE AT A TIME):
+1. Engineer implements, creates PR, reports back to EM
+2. EM dispatches architect to review PR
+3. If feedback: `sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>` — reads PR review automatically, no manual findings bake-in needed
+4. If approved: architect merges
 
-- **Hot-loop semantics:** For working docs that introduce or change long-running data-processing commands, do not dispatch full implementation until the spec names a Benchmark Contract and a prototype has been run against it. If the prototype misses, update the spec first.
-
-1. **Strategy doc → execution tickets.** Read the strategy doc for the track. File execution tickets for the next validation step — one ticket per parallelizable work item, each sized to fit cleanly in one agent's context window.
-2. **Parallel execution.** Dispatch engineers simultaneously across non-overlapping file sets, using worktrees if needed. Each engineer owns one ticket.
-3. **PR review.** Each engineer creates a PR. EM dispatches architect to review:
-   - If feedback: `sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>`
-   - If approved: architect merges
-4. **Validation gate.** After all work items merge, present findings to the user. Summarize what was built, what was learned, and what the strategy doc says the next step is. **Wait for user steer before filing the next execution ticket.** Do NOT auto-proceed.
-5. **Fix-candidate drain.** After the feature/epic ships, group `FIX BEFORE EPIC SHIPS` items into logical bundles and dispatch an immediate follow-up PR. Drop or bundle `OTHER FIX CANDIDATES`; do not leave them dangling.
-6. **Update strategy doc.** Based on findings and user steer, update the strategy doc if needed.
-
-**The validation gate is the core serialization point.** Within a deliverable, maximize parallelism. Across deliverables, serialize on user review. The user decides whether to continue, steer, or stop.
+After all tickets merged, close the epic issue:
+```bash
+gh issue close <epic#> --comment "All sub-issues complete: ..."
+```
 
 ---
 
@@ -298,8 +288,6 @@ Pause and alert human when:
 ---
 
 ## Continuous Improvement
-
-Workflow/process changes to `agent-os` are proposed via issue/retro and land only through owner-reviewed PRs. Do not edit persona files ad hoc from project work.
 
 EM is responsible for making the EM workflow better for future agents. As you work, notice friction — things that waste tokens, require workarounds, or cause repeated nudging.
 
