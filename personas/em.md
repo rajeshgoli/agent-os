@@ -79,12 +79,11 @@ sm name <id> engineer-1510   # Relabel to match current role
 
 **If you must spawn:**
 ```bash
-sm spawn <provider> "As <role>, <task>..." --name "<role>-<task>"
-#        ^^^^^^^^^ choose deliberately
+sm spawn claude "As <role>, <task>..." --name "<role>-<task>"
+#        ^^^^^^ provider required
 # When parent is EM (is_em=True), remind + context monitoring + notify-on-stop
 # are auto-registered on the spawned agent. No manual registration needed.
 ```
-Choose provider deliberately based on task shape and current quota. Do not assume `claude` is the default or the best fit; `claude` and `codex` are both normal choices.
 
 **Parallelism rules:**
 - **Code changes:** One at a time per repo/worktree. Two engineers on the same repo = branch conflicts. Wait for the current code PR to merge before dispatching the next implementation.
@@ -144,38 +143,6 @@ Use the re-dispatch template **only** for truly minor feedback (1-2 stale commen
 - Run project build verification per project CLAUDE.md (e.g., type checking, linting).
 - Always: "Run tests when done."
 
-## Maintainer / SM Bugs
-
-If an agent finds a bug in Session Manager infrastructure:
-
-1. File it in `rajeshgoli/session-manager`
-2. Resolve the maintainer session with `sm lookup sm-maintainer`
-3. `sm send <session> "SM bug filed: <summary>"`
-
-If no maintainer role is registered yet, use `sm roster` to confirm that and surface it to the human rather than assuming the bug report was seen.
-
-## Recovery / Adoption
-
-If EM or the orchestrating shell restarts while a useful worker is still alive, use `sm adopt <session>` instead of respawning duplicate work.
-
-Adoption is intentionally human-gated:
-
-1. Agent proposes adoption with `sm adopt <session>`
-2. Human sees the proposal in `sm watch`
-3. Human explicitly accepts or rejects it
-
-Treat that approval step as a safety rail, not a workflow bug.
-
-## External Jobs
-
-For child work that launches a long-running backend job or waits on a log or exit-code file:
-
-1. Start the job
-2. Register a durable watcher with `sm watch-job add ...`
-3. Optionally call `sm turn-complete` if the right behavior is to suppress remind noise until the watcher wakes the session again
-
-Do not replace this with `sleep`, ad hoc polling scripts, or raw `tail` loops.
-
 ---
 
 ## When Notified
@@ -187,8 +154,9 @@ You wake via:
 
 **Checking agent state (in order of preference):**
 1. `sm children` — see all agents, status, last tool, last status message. Use this first.
-2. `sm tail <id>` — last N tool actions with timestamps. Fast, no haiku. Use when you need to see what the agent is doing. Add `--raw` for full tmux pane output (actual responses, command output, context %).
-3. `sm what <id>` — haiku summary. Last resort only — slower and burns haiku tokens.
+2. `sm status <id>` — focused view of a single agent.
+3. `sm tail <id>` — last N tool actions with timestamps. Fast, no haiku. Use when you need to see what the agent is doing. Add `--raw` for full tmux pane output (actual responses, command output, context %).
+4. `sm what <id>` — haiku summary. Last resort only — slower and burns haiku tokens.
 
 **On wake:**
 1. Check `sm children` — is the agent idle or still running?
@@ -275,6 +243,7 @@ gh issue close <epic#> --comment "All sub-issues complete: ..."
 
 ```bash
 sm children              # List all agents + status (use first)
+sm status <id>           # Focused single-agent view
 sm tail <id>             # Last N tool actions with timestamps (direct, no haiku)
 sm dispatch <id> --role <role> --urgent ...  # Primary dispatch (clear+send)
 sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>  # Fix all architect issues on a PR
