@@ -162,42 +162,6 @@ Examples of standing rules (adapt per track):
 - Spawn when agent exists (`sm children` first, reuse)
 - Interfere before being paged
 
-### Manager-Only SM Tools
-
-**Maintainer / SM bugs**
-
-If an agent finds a bug in Session Manager infrastructure:
-
-1. File it in `rajeshgoli/session-manager`
-2. Resolve the maintainer session with `sm lookup sm-maintainer`
-3. `sm send <session> "SM bug filed: <summary>"`
-
-If no maintainer role is registered, confirm that with `sm roster` and surface it to the human instead of assuming the report was delivered.
-
-**Recovery / adoption**
-
-If the orchestrator restarts while useful workers are still running, use `sm adopt <session>` rather than spawning replacement sessions and hoping they reconcile later.
-
-Adoption is intentionally human-gated:
-
-1. Agent proposes adoption with `sm adopt <session>`
-2. Human sees the request in `sm watch`
-3. Human explicitly accepts or rejects it
-
-**External jobs**
-
-When delegated work launches a long-running backend job or waits on a file or exit code:
-
-1. Start the job
-2. Register a durable watcher with `sm watch-job add ...`
-3. Optionally call `sm turn-complete` if the goal is to suppress remind noise until the watcher wakes the session again
-
-Do not fall back to `sleep`, raw `tail`, or custom polling loops for this pattern.
-
-**Stable roles**
-
-For long-lived panels or service roles, use `sm register`, `sm lookup`, and `sm roster` to rediscover the right sessions after restarts instead of relying on memory of old IDs.
-
 ### Reviewer Dispatch
 
 Always include in reviewer dispatches:
