@@ -56,7 +56,7 @@ Lives in `docs/working/`. Picks the next step from a strategy doc. Scoped to one
 
 When you have a draft ready:
 
-1. **Create a PR targeting dev** with just the spec file. Branch name: `spec/<ticket#>-<short-name>`
+1. **Create a PR targeting dev** with just the spec file. Branch name: `spec/<ticket#>-<short-name>`. If you don't already have a clean worktree, create one from dev — never branch off epic branches for spec work.
 2. **Add provenance to the doc** — insert a metadata block near the top of the spec:
    ```markdown
    **PR:** <link>  |  **Author:** <role> (<provider>)  |  **Date:** <YYYY-MM-DD>

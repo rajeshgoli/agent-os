@@ -75,7 +75,7 @@ Picks the single next step from a strategy doc. Scoped to one deliverable (3–4
 
 Before writing, create a placeholder ticket and use the ticket number in the doc name.
 Write working spec docs to `docs/working/<ticket-number>_<descriptive-name>.md`.
-Open a PR targeting dev on a `spec/<ticket#>-<short-name>` branch with provenance (PR link, identity, provider, date) — see CLAUDE.md Spec Review Protocol.
+Open a PR targeting dev on a `spec/<ticket#>-<short-name>` branch with provenance (PR link, identity, provider, date) — see CLAUDE.md Spec Review Protocol. If you don't already have a clean worktree, create one from dev — never branch off epic branches for spec work.
 
 Include:
 - **Root cause analysis** — What is actually happening and why (for bug fixes)
