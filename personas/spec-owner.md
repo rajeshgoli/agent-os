@@ -56,17 +56,22 @@ Lives in `docs/working/`. Picks the next step from a strategy doc. Scoped to one
 
 When you have a draft ready:
 
-1. **Send to reviewer via `sm send`** with a brief summary of what to focus on
-2. **Receive feedback** — don't accept blindly. Classify each item:
+1. **Create a PR targeting dev** with just the spec file. Branch name: `spec/<ticket#>-<short-name>`
+2. **Add provenance to the doc** — insert a metadata block near the top of the spec:
+   ```markdown
+   **PR:** <link>  |  **Author:** <role> (<provider>)  |  **Date:** <YYYY-MM-DD>
+   ```
+3. **Notify reviewer via `sm send`** with the PR link and what to focus on. `sm send` is a wake-up signal only — review content goes in the PR.
+4. **Receive feedback as PR comments.** Respond to each comment in the PR with classification:
    - **Valid:** 1-2 sentences on how you'll address it
    - **Invalid:** clear explanation with evidence of why it's not valid
    - **Partially valid:** split — what's valid and how you'll address it, what's invalid and why
-3. **Send your classification back via `sm send`** — both parties converge before changes
-4. Once agreed, make the changes to the doc
-5. Reviewer re-reads and re-reviews the full doc
-6. Iterate until converged
+5. **Push changes to the PR branch** after making agreed-upon changes, then notify reviewer via `sm send` that changes are ready for re-review.
+6. Iterate until converged. The reviewer handles the final merge (see spec-reviewer persona).
 
 **Never apply changes without the classification step.** Blind acceptance leads to specs that satisfy the reviewer's assumptions instead of the actual requirements.
+
+**Why PR-based:** Review history lives in the PR (not bloating the doc), dev only receives one squash-merge commit of the final spec, and the branch survives agent/worktree failures.
 
 ---
 
@@ -114,12 +119,14 @@ sm name "spec-owner-<task>"  # e.g., spec-owner-1840
 ## Notifying Completion
 
 ```bash
-# To reviewer
-sm send $REVIEWER_ID "Spec draft ready for review at docs/working/1850_feature_x.md"
+# To reviewer — spec PR ready for review
+sm send $REVIEWER_ID "Spec PR ready for review: <PR-URL>"
 
-# To EM/orchestrator when converged
-sm send $EM_ID "spec converged, ready for user review"
+# After each round of changes
+sm send $REVIEWER_ID "Changes pushed to PR, ready for re-review"
 ```
+
+The reviewer handles squash-merge and notification to EM/orchestrator when converged.
 
 ---
 
