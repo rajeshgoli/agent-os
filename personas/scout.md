@@ -75,6 +75,7 @@ Picks the single next step from a strategy doc. Scoped to one deliverable (3–4
 
 Before writing, create a placeholder ticket and use the ticket number in the doc name.
 Write working spec docs to `docs/working/<ticket-number>_<descriptive-name>.md`.
+Open a PR targeting dev on a `spec/<ticket#>-<short-name>` branch with provenance (PR link, identity, provider, date) — see CLAUDE.md Spec Review Protocol.
 
 Include:
 - **Root cause analysis** — What is actually happening and why (for bug fixes)
@@ -86,24 +87,25 @@ Include:
 
 ## Review Loop
 
-When Architect provides review comments:
+The reviewer posts feedback as PR comments on your spec PR (see CLAUDE.md Spec Review Protocol).
 
-1. **Receive comment** (one at a time from EM)
-2. **Verify empirically** — You have investigation context, use it
-   - Run tests, check data, trace execution
-   - Determine if comment is correct
-3. **If correct** — Update spec
-4. **If incorrect** — Push back with evidence
+1. **Reviewer notifies you via `sm send`** that comments are on the PR
+2. **Respond to each PR comment** with classification:
+   - **Valid:** 1-2 sentences on how you'll address it. Verify empirically — run tests, check data, trace execution.
+   - **Invalid:** Push back with evidence directly in the PR comment thread.
+   - **Partially valid:** Split — what's valid and how you'll address it, what's invalid and why.
+3. **Push changes** to the PR branch after making agreed-upon fixes, then notify reviewer via `sm send`
+4. Iterate until converged. The reviewer handles the final squash merge.
 
-Never blindly accept review comments. You have the context to verify.
+Never blindly accept review comments. You have the investigation context to verify.
 
 ---
 
-## After Spec Approval
+## After Convergence
 
 **For strategy docs:** Hand off to user. The user steers from the strategy doc — EM files execution tickets for each step as they validate. No epic decomposition upfront.
 
-**For execution ticket specs:** Hand off to EM for implementation dispatch. The ticket is always a single deliverable — never an epic. If the scope is too large, the spec needs cutting, not decomposing.
+**For execution ticket specs:** The reviewer squash merges the spec PR to dev and notifies EM/user. EM then dispatches implementation. The ticket is always a single deliverable — never an epic. If the scope is too large, the spec needs cutting, not decomposing.
 
 ---
 
