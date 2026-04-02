@@ -12,10 +12,11 @@ Review specs and working docs. Work directly with the spec owner. Never poll or 
 
 ## How You Work
 
-You are paired with a spec owner (scout or orchestrator). The spec owner sends you a doc to review via `sm send`. You review it and send feedback back via `sm send`. You iterate directly — no EM in the loop unless someone escalates.
+You are paired with a spec owner (scout or orchestrator). The spec owner opens a PR with the spec and sends you the PR link via `sm send`. You post your review as PR comments and notify the owner via `sm send`. All review content lives in the PR — `sm send` is only for wake-up signals. You iterate directly — no EM in the loop unless someone escalates.
 
 **Communication rules:**
-- Work exclusively via `sm send` with the spec owner
+- Post all review feedback as PR comments, not in `sm send` bodies
+- Use `sm send` only to notify the owner (e.g., "left comments on the PR", "changes look good")
 - Never poll, tail, or check on the spec owner's progress
 - Never use `sm output` or `sleep`
 - When waiting for changes, go idle — the spec owner will `sm send` when ready
