@@ -32,12 +32,21 @@ Repos select a branch via git submodule tracking (see Setup below).
 
 ### Research branch only
 
+#### Software track (spec review)
+
 | Role | File | Purpose |
 |------|------|---------|
 | Orchestrator | `personas/orchestrator.md` | Track owner (EM + main engineer). Owns strategy doc and execution doc, delegates aggressively, interfaces with user at validation gates. |
 | Reviewer | `personas/reviewer.md` | Pure diff review — checklist, spec adherence, functional verification, merge. Does not write code. |
-| Spec Owner | `personas/spec-owner.md` | Write and own specs. Iterate with reviewers. Eliminate ambiguity before execution. |
-| Spec Reviewer | `personas/spec-reviewer.md` | Review specs and working docs. Verify claims against real code. Work directly with spec owner. |
+| Spec Owner | `personas/spec-owner.md` | Write and own specs. PR-based review — iterate with reviewer in the PR. Eliminate ambiguity before execution. |
+| Spec Reviewer | `personas/spec-reviewer.md` | Review specs via PR comments. Verify claims against real code. Squash merge on convergence. |
+
+#### Research track (collaborative science)
+
+| Role | File | Purpose |
+|------|------|---------|
+| Applied Scientist | `personas/applied-scientist.md` | Holds the pen on research notes. Forms hypotheses, runs experiments, collects data, writes analysis scripts. Output is a mini paper, not a spec. |
+| Peer Scientist | `personas/peer-scientist.md` | Collaborates — not just reviews. Runs own experiments, reproduces results, proposes alternatives, owns falsification and random controls. Can push to the PR. |
 
 ## Document Types (research branch)
 
@@ -45,6 +54,15 @@ Repos select a branch via git submodule tracking (see Setup below).
 |------|----------|-----------|---------|
 | Strategy doc | `docs/product/` | Living — updated after each validation gate | North star, current plan, lessons learned |
 | Execution ticket | `docs/working/` | Throwaway — replaced after each deliverable | Scoped spec for one deliverable (3-4 hours, up to 6 agents) |
+| Research note | `docs/working/` | Throwaway — mini paper with reproducible artifacts | Hypothesis, methodology, evidence, robustness, conclusion |
+
+## Review Protocols (research branch)
+
+Two distinct protocols for two types of work:
+
+**Software track — Spec Review (PR-based).** Spec owner creates a PR with the spec targeting dev. Reviewer posts feedback as PR comments. All iteration happens in the PR. On convergence, reviewer adds a Review History section and squash merges. `sm send` is used only as wake-up signals.
+
+**Research track — Collaborative Science (PR-based).** Applied scientist opens a PR with a research note. Peer scientist collaborates — running experiments, contributing ideas, challenging conclusions, pushing code to the branch. Either scientist can kill a falsified hypothesis. On convergence, peer adds a Collaboration Log and squash merges. Failed experiments are documented and merged — they update the strategy doc.
 
 ## Setup
 
