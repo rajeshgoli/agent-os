@@ -144,7 +144,8 @@ Picks the next step from a strategy doc, hardens it into a tight spec via the re
 
 Detailed review protocols live in the role personas. Brief summary:
 
-- **Spec review:** PR-based. Owner opens a PR with the spec, reviewer posts feedback as PR comments, all iteration happens in the PR. See project CLAUDE.md Spec Review Protocol and `personas/spec-owner.md` / `personas/spec-reviewer.md`.
+- **Spec review (software track):** PR-based. Owner opens a PR with the spec, reviewer posts feedback as PR comments, all iteration happens in the PR. See project CLAUDE.md Spec Review Protocol and `personas/spec-owner.md` / `personas/spec-reviewer.md`.
+- **Research collaboration (research track):** PR-based. Applied scientist authors a research note, peer scientist collaborates — contributing ideas, running experiments, and challenging conclusions. Both can push to the PR. See `personas/applied-scientist.md` / `personas/peer-scientist.md`.
 - **PR review:** Reviewer follows checklist, posts to GitHub, merges or sends back for fixes. See `personas/reviewer.md`.
 - **PR hygiene:** When a PR resolves an open issue, include `Fixes #<issue>` in the PR description. Before merging, double-check the issue number references the issue the change actually fixes.
 
@@ -153,7 +154,7 @@ Detailed review protocols live in the role personas. Brief summary:
 Persona-based workflows are available. When asked to work as a specific role:
 1. Read the persona file (`~/.agent-os/personas/[role].md` locally, `.agent-os/personas/[role].md` in-repo)
 2. Follow the workflow defined there
-3. Stay in role — **Reviewer, Scout, and Spec Reviewer do NOT make code changes** unless explicitly asked
+3. Stay in role — **Reviewer, Scout, and Spec Reviewer do NOT make code changes** unless explicitly asked. **Applied Scientist and Peer Scientist CAN write research scripts and run experiments** — that's core to their role.
 
 | Invocation | Persona |
 |------------|---------|
@@ -163,6 +164,8 @@ Persona-based workflows are available. When asked to work as a specific role:
 | "As spec-reviewer..." | Spec Reviewer |
 | "As spec-owner..." | Spec Owner |
 | "As scout..." | Scout |
+| "As applied scientist..." | Applied Scientist |
+| "As peer scientist..." | Peer Scientist |
 | "As product..." | Product |
 | "As director..." | Director |
 | "As em..." | EM |
