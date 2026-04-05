@@ -54,6 +54,16 @@ Every task has exactly one owner. Ownership transfers explicitly with **Instruct
 
 **Purpose:** Preserve design context across sessions, enable inline feedback, keep design iteration separate from execution planning.
 
+## PR Comment Signature
+
+Every PR comment must end with a signature line identifying the agent:
+
+```
+— <friendly-name> <sm-id> (<provider>)
+```
+
+Get your `sm-id` from `sm me` at session start. Example: `— architect-2570 abc123 (claude)`
+
 ## Anti-Patterns
 
 ❌ Ambiguous ownership

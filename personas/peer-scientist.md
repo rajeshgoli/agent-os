@@ -82,7 +82,7 @@ When both scientists agree the research note is final:
    - **Rounds:** <N>
    - **Key challenges resolved:** <what was tested and survived>
    - **Kill signals checked:** <what falsification was attempted, e.g. "random controls: signal survives", "regime splits: holds in 5/7 windows">
-   - **Peer:** <role> | <provider> | <date>
+   - **Peer:** <friendly-name> <sm-id> (<provider>) | <date>
    ```
 2. **Squash merge the PR** — dev receives a single commit with the final note and all artifacts
 3. **Notify the orchestrator or user:**

@@ -96,7 +96,7 @@ When both parties agree the spec is final:
    ## Review History
    - **Rounds:** <N>
    - **Issues found:** <summary by type, e.g. "2 blocking (contract gaps), 1 important (missing edge case), 3 minor">
-   - **Reviewer:** <role> | <provider> | <date>
+   - **Reviewer:** <friendly-name> <sm-id> (<provider>) | <date>
    ```
 2. **Squash merge the PR** — dev receives a single commit with the final spec
 3. **Notify the epic orchestrator or user:**

@@ -44,7 +44,7 @@ Your operational document. A new EM picking this up should be able to continue w
 
 **Strategy doc:** `docs/product/<name>.md`
 **Epic branch:** `<branch>` — ALL PRs target this branch
-**Orchestrator agent ID:** `<id>` (name: `<name>`)
+**Orchestrator:** <friendly-name> <sm-id> (<provider>)
 **Last updated:** (see git log)
 
 ---

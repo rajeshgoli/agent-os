@@ -140,7 +140,9 @@ Only after ALL blockers are resolved:
 
 1. **Post review comment to GitHub** (MANDATORY):
    ```bash
-   gh pr comment <number> --body "<your full review with checklist results>"
+   gh pr comment <number> --body "<your full review with checklist results>
+
+   — <friendly-name> <sm-id> (<provider>)"
    ```
 2. **Verify comment posted**: `gh pr view <number> --comments | tail -30`
 3. Merge: `gh pr merge <number> --merge --delete-branch`

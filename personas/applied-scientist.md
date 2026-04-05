@@ -39,7 +39,7 @@ Your output is a research note, not a spec. It reads like a mini paper, not a ti
 ```markdown
 # <Title>
 
-**PR:** #NNN | **Author:** <role> (<provider>) | **Date:** YYYY-MM-DD
+**PR:** #NNN | **Author:** <friendly-name> <sm-id> (<provider>) | **Date:** YYYY-MM-DD
 
 ## Hypothesis
 What pattern/inefficiency are you investigating and WHY does it exist?
