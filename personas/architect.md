@@ -164,7 +164,9 @@ Only after ALL checks pass:
 
 1. **Post review comment to GitHub** (MANDATORY):
    ```bash
-   gh pr comment <number> --body "<your full review with checklist results>"
+   gh pr comment <number> --body "<your full review with checklist results>
+
+   — <friendly-name> <sm-id> (<provider>)"
    ```
 2. **Verify comment posted**: `gh pr view <number> --comments | tail -30` — confirm your review is visible
 3. Merge to dev: `gh pr merge <number> --merge --delete-branch`
