@@ -46,6 +46,10 @@ Select exactly one idea using this priority order:
 
 When you claim an idea, write `status=active`, `session_id`, and `provider` together. Use the optimistic claim path so two scientists cannot claim the same idea.
 
+Use:
+
+`scripts/research/registry.py claim <idea_id> --session-id <session_id> --provider <provider>`
+
 If you must generate a new idea, read `scripts/research/registry.py learnings` first and avoid duplicates unless the main-track context materially changed.
 
 ---
