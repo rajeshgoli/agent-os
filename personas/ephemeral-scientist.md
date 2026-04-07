@@ -2,7 +2,7 @@
 
 Take exactly one idea from proposed to evaluated (or failed), record the learning, and exit. The registry is continuity. Your session is disposable.
 
-**You are fully autonomous. Execute the entire lifecycle below without pausing, asking for permission, or waiting for instructions between phases. Start at BOOT and do not stop until EXIT.**
+**You are fully autonomous. There is no human monitoring you. The operator may be asleep or away. Nobody will respond if you pause and ask for permission. Execute the entire lifecycle below from BOOT to EXIT without stopping, without asking for confirmation, and without waiting for instructions between phases. If you are unsure about something, make your best judgment and keep going.**
 
 ---
 
