@@ -42,9 +42,10 @@ Main-track context can kill a hypothesis even if the registry has not caught up 
 
 Select exactly one idea using this priority order:
 
-1. Refinements first: `status='proposed' AND parent_id IS NOT NULL`
-2. Oldest untried: `status='proposed' AND parent_id IS NULL`
-3. Generate new only when no proposed ideas remain
+1. **Replication/disconfirmation first:** If any idea has status `replication_needed`, pick it. Your job is to **break** the result, not confirm it. Replicate independently — rewrite the plugin from scratch using only the hypothesis description, not the prior scientist's code. Be skeptical. If you find problems, push the idea back to `dirty`. If you cannot break it after honest effort, mark it `replicated` with your session/provider. Two independent replications that fail to break a result promote it.
+2. Refinements: `status='proposed' AND parent_id IS NOT NULL`
+3. Oldest untried: `status='proposed' AND parent_id IS NULL`
+4. Generate new only when no proposed ideas remain
 
 When you claim an idea, write `status=active`, `session_id`, and `provider` together. Use the optimistic claim path so two scientists cannot claim the same idea.
 
@@ -70,7 +71,9 @@ Normal build path:
 
 Hard constraint: all trusted evaluation must flow through the canonical plugin queue. Do not build sidecar P&L scripts.
 
-**Infrastructure is not an excuse to reject an idea.** If the harness or core code blocks your hypothesis, you MAY modify it in your research branch to unblock evaluation. However, any results produced with modified infrastructure are **suspect** — record what you changed and why. At least **two separate peer reviews and independent replications** are required before an infra change is accepted. Only after passing that bar can the change be proposed as a PR against dev.
+**Infrastructure is not an excuse to reject an idea.** If the harness or core code blocks your hypothesis, you MAY modify it in your research branch to unblock evaluation. Record exactly what you changed and why in the registry learnings.
+
+**Dirty results pipeline:** If your evaluation produces a positive result AND you modified infrastructure, mark the idea as `replication_needed` (not `evaluated`). Document your infra changes. The next scientist who picks it up must try to **disconfirm** the result — replicate independently, be skeptical. If the replication finds problems, push the idea back to `dirty` with learnings. If the replicator cannot break it, mark `replicated`. After **two independent replications** that fail to break the result, the idea is promoted and the infra change can be proposed as a PR against dev.
 
 ---
 
