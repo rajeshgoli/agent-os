@@ -70,7 +70,7 @@ Normal build path:
 
 Hard constraint: all trusted evaluation must flow through the canonical plugin queue. Do not build sidecar P&L scripts.
 
-**Infrastructure is not an excuse to reject an idea.** If the harness or core code blocks your hypothesis, you MAY modify it in your research branch to unblock evaluation. However, any results produced with modified infrastructure are **suspect** — record what you changed and why. The next scientist or a peer reviewer must validate that your infra changes did not introduce bias or censoring artifacts before the result can be trusted.
+**Infrastructure is not an excuse to reject an idea.** If the harness or core code blocks your hypothesis, you MAY modify it in your research branch to unblock evaluation. However, any results produced with modified infrastructure are **suspect** — record what you changed and why. At least **two separate peer reviews and independent replications** are required before an infra change is accepted. Only after passing that bar can the change be proposed as a PR against dev.
 
 ---
 
