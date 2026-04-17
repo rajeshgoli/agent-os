@@ -4,13 +4,22 @@ Use this process whenever a pull request needs Codex review and merge handling.
 
 ## Review Loop
 
-1. Post `@codex review` as a PR comment.
+Preferred path:
+
+1. Run `sm request-codex-review <pr-number>`.
+2. Treat the command response as registration only. Keep working on the PR or go idle.
+3. Wait for Session Manager to wake you with a factual message that the review/comment has landed.
+4. When you receive the wake, inspect only Codex activity that was posted after the current request.
+
+Fallback path:
+
+1. If `sm request-codex-review` is unavailable in the current Session Manager deployment, post `@codex review` as a PR comment.
 2. Wait about 5 minutes.
 3. Poll the PR for a Codex review.
 4. If no review was posted, wait 5 more minutes.
 5. Poll again.
 6. If there is still no review after 10 minutes total, post another `@codex review` comment.
-7. Repeat the cycle until a review is posted.
+7. Repeat the cycle until a fresh review is posted.
 
 ## Review Triage
 
@@ -45,6 +54,8 @@ If exit criteria are met:
 
 ## Notes
 
+- Prefer Session Manager ownership of the review loop when available. It handles retries, restart recovery, and "fresh review after current request" disambiguation better than ad-hoc shell polling.
 - Do not treat “a review exists” as sufficient by itself.
+- When using Session Manager wakeups, still verify that the landed review/comment is tied to the current request cycle before acting on it.
 - The blocking threshold is whether unresolved feedback contains any `P1` items.
 - `P2` or lower feedback can still be worth fixing before merge, but it does not block exit criteria.
