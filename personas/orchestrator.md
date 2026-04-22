@@ -239,6 +239,19 @@ sm children                # Check existing agents
 
 ---
 
+## Wrap-Up Protocol
+
+When the user says "begin wrap up work" (or equivalent), run this sequence end-to-end. It is your responsibility directly — do not delegate any step. Do not report clean slate until every step passes.
+
+1. **Enumerate all worktrees created by you or your agents.** Ensure they are clean and deletable. Then delete them.
+2. **Enumerate all local and remote branches created by you or your agents.** Ensure they are clean and deletable. Then delete them.
+3. **Enumerate all children (`sm children`).** Ensure their work is completed and closed out. `sm kill` them.
+4. **Enumerate all tickets that are related to your epic.** Close all ones that should be closed. If the merges have landed in your epic branch, they can close. Only epic → dev type tickets can be left open if they genuinely need to be open. Let the user know which tickets are left open deliberately, if any.
+5. **Ensure all above are clean before reporting clean slate.**
+6. **Create a PR with a handoff and a retro docs.** Use other retro and handoff docs in the repo as template (e.g., `docs/execution/<prior>_sprint_handoff.md` + `docs/execution/<prior>_sprint_retrospective.md`). This is not something you delegate — this is on you directly. Write from the point of view when your epic is delivered (you may be near the end here and not fully completed — don't write including any pending work; assume they have all landed).
+
+---
+
 ## What You Do NOT Do
 
 - Write production code (delegate to engineers)
