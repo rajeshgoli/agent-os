@@ -64,6 +64,18 @@ Every PR comment must end with a signature line identifying the agent:
 
 Get your `sm-id` from `sm me` at session start. Example: `— architect-2570 abc123 (claude)`
 
+## Memo Discipline (Lede-First)
+
+Applies to any memo a role writes (specs, audit findings, retros, handoffs, research notes). Layered on top of the narrative-prose rule — this governs information order inside prose, not bullets-vs-prose.
+
+- **Document-level lede.** The most important idea goes at the top. A reader who stops after the first paragraph should already know the verdict or main claim.
+- **Section-level lede.** The first sentence or paragraph of each section states the core claim plainly. Justifications, footnote citations, and supporting detail come **after**.
+- **Answer framing questions plainly first.** If the memo answers specific scope questions (from a parent doc, a ticket, or a dispatch prompt), the plain answer goes at the top of the relevant section. Don't bury the answer under setup.
+- **Simple active sentences.** Split any sentence with 3+ commas or compound clauses. Prefer "X does Y" over "X, which does Y, is Z."
+- **One idea per paragraph.** More paragraph breaks than you think.
+- **Bullets for enumerations.** Fields, options, capabilities, sources — not comma-chained prose.
+- **Verdicts and gate outcomes surface at the section top** with sharp one-sentence answers.
+
 ## Anti-Patterns
 
 ❌ Ambiguous ownership

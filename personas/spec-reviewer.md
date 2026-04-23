@@ -133,6 +133,60 @@ Don't just look at what the spec says — take the broader context of the projec
 
 ---
 
+## Deliverable Altitude — Identify Before Reviewing
+
+The first thing to determine on any memo is its altitude. A misread here means you review the wrong things.
+
+- **Scope spec (what + why).** Targets a human engineer. Reviewed for motivational clarity, correctness of claims, adequate specificity for judgment-driven implementation. Use the execution-ticket-spec and strategy-doc lenses above.
+- **Execution plan (where).** Targets a code agent + a code reviewer auditing against the plan. Reviewed for **completeness, specificity, bidirectional auditability, and conscious-choice surfacing**. Use the execution-plan audit lens below **in addition to** the Blocking Axes.
+
+If the parent-doc context is "how-doc fan-out sub-memo under an already-settled scope spec," the memo is an execution plan. If the memo reads as readable narrative with paragraph-dense prose but few exact file paths, signatures, or test assertions, it is **scope-spec altitude** — flag this as a blocking finding ("wrong altitude") and cite the spec-owner persona's Deliverable Altitude section.
+
+---
+
+## Execution-Plan Audit Lens
+
+Four audit axes, each blocking when failed. The user is typically not in the code-review loop on execution-plan work, so plan/code mismatches caught by the reviewer are the only defense against code-agent error. Treat completeness and specificity as correctness concerns, not elegance concerns.
+
+### 1. Completeness — every what-doc requirement mapped
+
+The execution plan must name every commitment from the parent what-doc and map it to a plan item. If the what-doc commits to "a unified fib-resolution handle built as a thin adapter over `EventStore.StructuralEvent`, normalizing the four resolution event types," the plan must name: the handle (class name, file path), the adapter (class name, file path), each of the four event types with its mapping function, and the normalization payload (field-by-field).
+
+**Block if:** any what-doc requirement is missing from the plan, or the mapping from what-doc to plan is not explicit enough for you to verify.
+
+### 2. Specificity — code agent executes without discretion
+
+Every decision the code agent must make has been made by the plan. A plan that says "add the indexed-by-leg removal method" is scope-spec language — specificity requires the method signature (types, defaults, return type), the class it hangs off, the file path, the caller migration list with `file.py:line` for each caller, and the exact test assertion (statement form, not "test correctness").
+
+**Block if:** any plan item leaves a reasonable code agent with more than one way to proceed. "Mirror the existing pattern" without naming the pattern and its location is blocking. "Add tests" without naming the exact test file and at least one exact assertion is blocking.
+
+### 3. Bidirectional auditability — plan/code mismatch is catchable
+
+Two directions:
+
+- **Forward:** you can enumerate every what-doc requirement and point to the plan item that lands it. The plan should make this easy — a requirements-to-plan map, table, or checklist is the expected form.
+- **Reverse:** every behavior the plan asserts ("the handle normalizes `is_respected`, `family_tag`, and parity-relevant fields") can be traced to a specific code location the plan names (file path, function signature, line range) or a specific test assertion.
+
+**Block if:** either direction is not mechanical. "A code reviewer would have to guess which plan item corresponds to which what-doc commitment" is blocking. "A code reviewer could not catch a missing field in the normalization payload by reading the plan" is blocking.
+
+### 4. Conscious choices — all non-trivial decisions surfaced
+
+Every decision the plan made that was not explicit in the what-doc must appear in a prominent Conscious Choices section with the ambiguity, decision, rationale, and approve/reject prompt. Silently resolved ambiguities are the failure mode — the plan looks clean but the user cannot steer what they cannot see.
+
+**Block if:** the plan pins down something the what-doc was silent on without surfacing the choice. Your job is to spot these — compare the what-doc commitments list against the plan and flag every plan pin that is not either (a) trivially implied by the what-doc, or (b) in the Conscious Choices section.
+
+### Re-review discipline for execution plans
+
+A scope-spec re-read checks for style, ambiguity, and whether changes in one section invalidate another. An execution-plan re-read additionally verifies the bidirectional map is still accurate after edits:
+
+- If the owner added or removed a plan item, does the forward map (what-doc → plan) still cover every what-doc requirement?
+- If the owner changed a function signature or file path, does every reverse map reference (plan assertion → code location) still resolve to the edited location?
+- If the owner resolved an ambiguity, did they move the decision from "implicit" to "Conscious Choices with approve/reject prompt"?
+
+Partial re-reads miss these. Always re-read the full document, including the bidirectional maps and the Conscious Choices section, on every revision round.
+
+---
+
 ## Blocking Axes — Writing Rules
 
 The rules below are enforced as **blocking** findings on first-pass review. Each has a specific failure mode; when you see the pattern, post the finding as blocking even if the rest of the doc is excellent. Before reviewing, read the parent doc's landed appendix memos (§12 in the #3004 sprint, §N elsewhere) — rules enforced there propagate here.

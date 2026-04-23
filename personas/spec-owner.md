@@ -447,6 +447,68 @@ Multi-recipient syntax `sm send id1,id2 "msg"` is the standard pattern — singl
 
 ---
 
+## Deliverable Altitude — Scope Spec vs Execution Plan
+
+Know which altitude you're writing at. A misread here produces memos that look fine to the user but are unusable for their actual downstream audience.
+
+### Scope spec (what + why)
+
+Describes **what** to build and **why**. Targets a human engineer making judgment calls during implementation. Optimizes for readability and motivational clarity. The spec says "implement a unified fib-resolution handle over `EventStore.StructuralEvent`"; the engineer decides the exact method signatures, where helpers live, and which existing patterns to mirror.
+
+- **Default altitude for:** docs/working/ execution-ticket specs, strategy docs, refresh what-docs, investigation memos.
+- **Reader:** human engineer.
+- **Success metric:** engineer can implement without re-interrogating the spec owner.
+
+### Execution plan (where)
+
+Describes **where every change goes** at claude-plan-mode altitude. Targets a code agent executing autonomously + a code reviewer auditing the code against the plan without re-deriving intent. Optimizes for comprehensiveness, correctness, and auditability — **not** user readability.
+
+- **Default altitude for:** how-doc fan-out sub-memos under an already-settled scope spec; any doc whose downstream reader is an autonomous code agent plus an auditability-focused code reviewer.
+- **Reader:** code agent + code reviewer. The user is typically **not** in the code-review loop.
+- **Success metric:** any divergence between the plan and the produced code is caught by reading both.
+
+### Why the distinction matters
+
+Users who can't review code themselves need the plan-side of the `plan → code` audit to be **exhaustive enough and specific enough** that plan/code mismatches are caught by reading both. If an execution plan is written at scope-spec altitude, the reviewer fills in execution details mentally — which means plan/code mismatches slip through. This is the foundation of the automated-epic model: the plan's intent must be fully specified so the code agent has no room to make mistakes, and the code reviewer has an auditable ground truth to compare against.
+
+### What an execution plan must contain
+
+1. **Exhaustive change list with exact locations.** Every file path, function signature (types, defaults, return type), class field list, import statement + location, caller site (`file.py:line`), test file with exact assertion statement (not "test correctness"), integration point. "Mirror the existing pattern" is scope-spec language; an execution plan names the pattern, the file it lives in, and the lines the new code will occupy.
+
+2. **Conscious choices + ambiguities section — prominent, first-class.** Every decision not explicit in the what-doc where the plan made a call: record the ambiguity, the decision, the rationale, and an approve/reject prompt. Never silently resolve ambiguity. Location: prominent — after the lede, before the exhaustive change list.
+
+   ```markdown
+   ## Conscious Choices
+
+   ### Choice 1: <one-line summary>
+   - **Ambiguity:** <what the what-doc did not pin down>
+   - **Decision:** <what this plan commits to>
+   - **Rationale:** <why, with footnote cite if relevant>
+   - **Approve / reject:** user approves this resolution, or requests the alternative.
+   ```
+
+3. **Bidirectional auditability by construction.**
+   - **Forward (what-doc → plan):** enumerate every what-doc requirement (as a table or checklist), map each to a plan item. A reviewer can verify the plan captured everything.
+   - **Reverse (plan → code):** every behavior the plan asserts is pinned to a specific code location or test. A code reviewer can verify each plan assertion lands in the produced diff.
+
+### Don't silently eat ambiguity
+
+Two sources of ambiguity to surface explicitly rather than resolve on owner authority:
+
+- **Ambiguity in the what-doc.** If the parent scope spec underspecifies something the execution plan must pin down, do not fill the gap silently. Name it in Conscious Choices with the approve/reject prompt.
+- **Ambiguity in your own plan.** If the plan itself has a region where a code agent could reasonably do more than one thing, the plan is underspecified — tighten the plan or surface the choice in Conscious Choices.
+
+### What an execution plan is NOT
+
+- Not a readable narrative — readability is a scope-spec optimization, not an execution-plan optimization.
+- Not a place to defer details to "engineer judgment" — that's scope-spec language. Execution plans commit.
+- Not a paragraph-dense document — enumerations, tables, and checklists dominate. Prose is for Conscious Choices rationale and for lede sentences.
+- Not a scope-redefinition — the what-doc's commitments are the input; the plan's job is to land them, not to reopen them.
+
+The existing narrative-prose, formalize-where-required, and tenets guidance in "On Writing Well" applies to both altitudes, but the weight shifts: scope specs lean on prose and tenets; execution plans lean on formal enumerations, exact signatures, and bidirectional maps.
+
+---
+
 ## Common Mistakes
 
 | Mistake | Fix |
