@@ -117,7 +117,8 @@ The two altitudes conflict: what-docs optimize for readability, scannability, an
 - **Section-level lede buried under setup.** First sentence of each section states the core claim plainly. Block if framing questions aren't answered plainly at the top of the relevant section.
 - **Dense sentences with compound clauses.** Sentences with 3+ commas that could be split into simple active sentences. Block if the doc is hard to scan because sentences are compound-stacked.
 - **Large paragraphs mixing multiple ideas.** One idea per paragraph. Block if paragraphs need to be chopped for the reader to parse.
-- **Comma-chained prose where bullets belong.** Fields, options, capabilities, sources enumerated as comma lists instead of bullets. Block when the enumeration is load-bearing.
+- **Comma-chained prose where bullets belong.** Fields, options, capabilities, sources enumerated as comma lists instead of bullets. Tables forced into bullets, or bullet lists rewritten as prose, are the symmetric violation. Block when the enumeration is load-bearing and the form doesn't match the content.
+- **Hard line breaks inside paragraphs.** Paragraphs should be one continuous line; markdown renderers handle word-wrap, and their word-wrap is superior to manual 72/80-column wrapping. Block if paragraphs are hard-wrapped — they read badly on reflow and are painful to edit.
 - **Verdicts and gate outcomes buried.** They should be at section top with sharp one-sentence answers.
 - **Ambiguity that would cause two engineers to implement differently.** Standard scope-spec concern.
 - **All Blocking Axes below** that apply to prose content (narrative prose, present tense, footnote refs, archive-frozen, sm-id frontmatter, distilled appendix format).
@@ -172,16 +173,10 @@ Memos read as narrative English. Bullets are for enumerable data (tables of numb
 ```
 ## §3.5 Design
 
-Welford's online algorithm computes mean and standard deviation in a single pass
-with constant memory, which matters because the dwell-time distribution is read
-from the full ES history once and never re-derived. The ES 2007-2008 slice seeds
-the initial mean and variance; that slice is the earliest dense regime in the
-corpus, so seeding there captures the full drift surface. NQ, YM, and RTY rows
-ship as placeholders in `src/registry/dwell_seed.json` because their per-instrument
-slice specifications belong to a later readiness audit.
+Welford's online algorithm computes mean and standard deviation in a single pass with constant memory, which matters because the dwell-time distribution is read from the full ES history once and never re-derived. The ES 2007-2008 slice seeds the initial mean and variance; that slice is the earliest dense regime in the corpus, so seeding there captures the full drift surface. NQ, YM, and RTY rows ship as placeholders in `src/registry/dwell_seed.json` because their per-instrument slice specifications belong to a later readiness audit.
 ```
 
-**Catch:** sections with three or more consecutive bullet lines conveying arguments (not enumerable data) are blocking. Tables and artefact lists stay bullet-form; reasoning stays prose.
+**Catch:** sections with three or more consecutive bullet lines conveying arguments (not enumerable data) are blocking. Tables stay tables; artefact lists stay bullets; reasoning stays prose.
 
 ### Present tense; memo ships as final artifact
 
@@ -189,21 +184,14 @@ Memo text reads as if shipping now. No references to earlier drafts, rounds, or 
 
 **Violation (blocking):**
 ```
-The earlier draft of this memo proposed keeping `mode=both` as a runtime-layer
-composition, but after Round 3 review we committed to pipeline-layer composition.
-Section 5.2 previously read "harness composition is cleaner but pays double runtime
-cost plus a merge mechanism"; that framing has been retired in favor of the
-pipeline-composed approach.
+The earlier draft of this memo proposed keeping `mode=both` as a runtime-layer composition, but after Round 3 review we committed to pipeline-layer composition. Section 5.2 previously read "harness composition is cleaner but pays double runtime cost plus a merge mechanism"; that framing has been retired in favor of the pipeline-composed approach.
 ```
 
 **Corrected:** drop the retrospective paragraph from the main body; add to end-of-memo Q&A:
 ```
 ### Options considered but not adopted
 
-**Why not runtime-layer `mode=both`?** Early drafts considered placing the
-dual-family composite in the game runtime itself, saving roughly 14% compute per
-bar via shared lifecycle + frame amortization. The audit ultimately rejected
-this because [...]. Pipeline-layer composition is the committed path.
+**Why not runtime-layer `mode=both`?** Early drafts considered placing the dual-family composite in the game runtime itself, saving roughly 14% compute per bar via shared lifecycle + frame amortization. The audit ultimately rejected this because [...]. Pipeline-layer composition is the committed path.
 ```
 
 **Catch:** any phrase of the form "earlier round / earlier version / previously / we originally" in the main body is blocking. References to decisions in the Options-Q&A section are fine.
@@ -214,17 +202,12 @@ Main prose is about what the component is and what it does. File:line references
 
 **Violation (blocking):**
 ```
-The `StructuralDefenseTracker._acceptance_level_price` method at
-`src/sequence_model/structural_defense_tracker.py:669-676` computes the reward
-level from `target_frac`, and `_resolve_interaction` at lines 442-451 fires
-resolution when reward hits before risk.
+The `StructuralDefenseTracker._acceptance_level_price` method at `src/sequence_model/structural_defense_tracker.py:669-676` computes the reward level from `target_frac`, and `_resolve_interaction` at lines 442-451 fires resolution when reward hits before risk.
 ```
 
 **Corrected:**
 ```
-The proportional tracker computes the reward level from `target_frac`[^reward-level]
-and fires resolution when reward hits before risk[^resolution], matching the
-two-axis model.
+The proportional tracker computes the reward level from `target_frac`[^reward-level] and fires resolution when reward hits before risk[^resolution], matching the two-axis model.
 
 [^reward-level]: `_acceptance_level_price` at `src/sequence_model/structural_defense_tracker.py:669-676`.
 [^resolution]: `_resolve_interaction` at `src/sequence_model/structural_defense_tracker.py:442-451`.
@@ -242,12 +225,7 @@ When the spec identifies a focus area that requires scoped future work (an audit
 ```
 ### 9.4 Now (conceptual / documentation work, no code)
 
-- **Plugin audit (#3009).** Enumerate oracle, mechanical, proximity...
-  **Landed — see [Appendices](#12-appendices) and [the memo](./3009_plugin_audit.md).**
-  Seven inline main-doc edits applied (§2.2 proportional acceptance, §3.1 prefix
-  scope, §3.6 respect_risk wiring, new §3.6.1 target_frac parameter, §3.7 Tier-3
-  rename drop, §3.8 unified-handle commitment, §5.2 prefix phrasing); six §9.3
-  prototype items file the adapter + detail-dict extensions...
+- **Plugin audit (#3009).** Enumerate oracle, mechanical, proximity... **Landed — see [Appendices](#12-appendices) and [the memo](./3009_plugin_audit.md).** Seven inline main-doc edits applied (§2.2 proportional acceptance, §3.1 prefix scope, §3.6 respect_risk wiring, new §3.6.1 target_frac parameter, §3.7 Tier-3 rename drop, §3.8 unified-handle commitment, §5.2 prefix phrasing); six §9.3 prototype items file the adapter + detail-dict extensions...
 ```
 
 **Corrected:** remove the bullet entirely. Outcome lives in the main body + appendix. Leave no breadcrumb in the Spec Development section.
@@ -256,16 +234,14 @@ When the spec identifies a focus area that requires scoped future work (an audit
 ```
 ### 9.1 New item from audit
 
-- **NPC_* event renaming.** The #3012 EventStore audit identified four NPC_*
-  event types that could be renamed for clarity. Filing as §9.1 follow-up.
+- **NPC_* event renaming.** The #3012 EventStore audit identified four NPC_* event types that could be renamed for clarity. Filing as §9.1 follow-up.
 ```
 
 **Catch:** Spec-dev work is itself supposed to **reduce** the spec-dev queue. Filing additional items from within an audit without a strong finding that prevents decisive landing is blocking. If the audit can decide (as here — commit to keeping the names, citing #3009's prior settlement), land that commitment in the main doc with audit-provenance. If the audit genuinely cannot decide (e.g., "we can't choose between options until measurement Y is done"), name the specific blocker; only then is the new item legitimate.
 
 **Corrected:** absorb the decision into the main doc with `[from #3012]` provenance:
 ```
-§3.7 events bullet: Current NPC_* naming stays; the #3012 audit verified no
-conflict with the #3009 Tier-3 commitment. [from #3012]
+§3.7 events bullet: Current NPC_* naming stays; the #3012 audit verified no conflict with the #3009 Tier-3 commitment. [from #3012]
 ```
 
 **Empty Spec-Dev subsection:** When every bullet in a Spec Development subsection has been removed via landing, the subsection **header itself** must be removed too — not left empty, not replaced with a tombstone marker. The top-level Spec Development narrative intro updates to reflect the new subsection count.
@@ -282,25 +258,19 @@ The anti-pattern is serial deferral: "the memo punts to the how-doc, the how-doc
 
 **Violation (blocking — deferral without scoping the blocker):**
 ```
-The #2671 temporal split (train<2022 / val 2022-2024 / test≥2024) would apply to
-our hierarchical-representation experiment, but we defer the exact split boundary
-to the how-doc.
+The #2671 temporal split (train<2022 / val 2022-2024 / test≥2024) would apply to our hierarchical-representation experiment, but we defer the exact split boundary to the how-doc.
 ```
 
 **Catch:** "defer to how-doc / defer to implementation / will be decided later" without naming what specifically cannot be decided now and why is blocking. The audit memo is itself the thinking; either decide now, or name the information gap and file under Spec Development (not as a generic deferral).
 
 **Corrected (decide inline):**
 ```
-The experiment inherits the #2671 temporal split directly: train before 2022,
-validate 2022-2024, test 2024 onward. [from #3016, inheriting #2671 §7]
+The experiment inherits the #2671 temporal split directly: train before 2022, validate 2022-2024, test 2024 onward. [from #3016, inheriting #2671 §7]
 ```
 
 **Corrected (legitimate Spec-Dev filing with strong finding):**
 ```
-The experiment's split boundary depends on the dwell-time distribution around
-2022, which cannot be verified without the Welford reference-slice bootstrap
-(filed separately as §9.2 / #3024). Once that lands, the split defaults to
-2022/2024 unless the distribution indicates a later cut.
+The experiment's split boundary depends on the dwell-time distribution around 2022, which cannot be verified without the Welford reference-slice bootstrap (filed separately as §9.2 / #3024). Once that lands, the split defaults to 2022/2024 unless the distribution indicates a later cut.
 ```
 
 Here the blocker is specific (Welford bootstrap hasn't run); the new Spec-Dev item is legitimate because the audit names the information gap.
@@ -347,17 +317,7 @@ Each appendix entry has:
 ```markdown
 ### 12.5 Appendix — #2882 Incorporation Audit
 
-The #2882 capability audit was the foundation of the refresh's capability-parameter
-framework. This audit walks #2882 paragraph-by-paragraph against the current spec
-and identifies what was preserved, extended, departed from, and lost. The capability
-model is fully preserved — five capabilities (ladder, sweep, dwell_groups,
-reaction_linker, lifecycle) stay as first-class `C_runtime` parameters. The dependency
-graph is preserved in its structural form, though the specific dependency edges are
-re-expressed under the new parameter surface. Three future-work items from #2882
-were promoted to committed architecture in the refresh. One item was deliberately
-departed from — the ladder capability was promoted from "flagged for audit" to
-"commitment as capability." Seven items from #2882 are lost, three of which have
-main-doc impact and four of which are how-doc details.
+The #2882 capability audit was the foundation of the refresh's capability-parameter framework. This audit walks #2882 paragraph-by-paragraph against the current spec and identifies what was preserved, extended, departed from, and lost. The capability model is fully preserved — five capabilities (ladder, sweep, dwell_groups, reaction_linker, lifecycle) stay as first-class `C_runtime` parameters. The dependency graph is preserved in its structural form, though the specific dependency edges are re-expressed under the new parameter surface. Three future-work items from #2882 were promoted to committed architecture in the refresh. One item was deliberately departed from — the ladder capability was promoted from "flagged for audit" to "commitment as capability." Seven items from #2882 are lost, three of which have main-doc impact and four of which are how-doc details.
 ```
 
 (8 sentences; exceeds 4-5 sentence rule)
@@ -366,12 +326,7 @@ main-doc impact and four of which are how-doc details.
 ```markdown
 ### 12.5 Appendix — #2882 Incorporation Audit
 
-The #2882 capability audit was the foundation of the refresh's capability-parameter
-framework. This appendix records what #2882 proposed that the refresh preserves,
-extends, departs from, or loses. The capability model and dependency graph survive
-intact; three future-work items promote to committed architecture; seven items are
-either silently dropped or deferred to the how-doc, of which three carry main-doc
-impact and four are implementation detail.
+The #2882 capability audit was the foundation of the refresh's capability-parameter framework. This appendix records what #2882 proposed that the refresh preserves, extends, departs from, or loses. The capability model and dependency graph survive intact; three future-work items promote to committed architecture; seven items are either silently dropped or deferred to the how-doc, of which three carry main-doc impact and four are implementation detail.
 
 **Key takeaways:**
 - Capability model preserved — five capabilities stay as first-class `C_runtime`.
