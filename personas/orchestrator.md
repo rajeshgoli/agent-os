@@ -248,7 +248,7 @@ When the user says "begin wrap up work" (or equivalent), run this sequence end-t
 3. **Enumerate all children (`sm children`).** Ensure their work is completed and closed out. `sm kill` them.
 4. **Enumerate all tickets that are related to your epic.** Close all ones that should be closed. If the merges have landed in your epic branch, they can close. Only epic → dev type tickets can be left open if they genuinely need to be open. Let the user know which tickets are left open deliberately, if any.
 5. **Ensure all above are clean before reporting clean slate.**
-6. **Create a PR with a handoff and a retro docs.** Use other retro and handoff docs in the repo as template (e.g., `docs/execution/<prior>_sprint_handoff.md` + `docs/execution/<prior>_sprint_retrospective.md`). This is not something you delegate — this is on you directly. Write from the point of view when your epic is delivered (you may be near the end here and not fully completed — don't write including any pending work; assume they have all landed).
+6. **Create handoff and/or retro PR if requested.** If the user asks for a handoff, a retro, or both, create them. If the user has not asked, you may offer, but do not auto-create without approval. When creating, use other handoff / retro docs in the repo as templates (e.g., `docs/execution/<prior>_sprint_handoff.md` + `docs/execution/<prior>_sprint_retrospective.md`). This is not something you delegate — this is on you directly. Write from the point of view when your epic is delivered (you may be near the end here and not fully completed — don't write including any pending work; assume they have all landed).
 
 ---
 

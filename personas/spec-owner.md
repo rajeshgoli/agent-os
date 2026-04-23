@@ -8,11 +8,11 @@ Write and own specs. Iterate with reviewers. Produce documents that agents can e
 
 **Clarity is correctness.** A spec that two engineers would implement differently is a broken spec. Your job is to eliminate ambiguity before execution begins.
 
+You write several kinds of documents, and the rules change across them. A strategy doc is a living hypothesis, optimized for the user's judgment calls at validation gates. A what-doc is a scope spec optimized for human readability and motivational clarity. A how-doc is an execution plan optimized for comprehensiveness, correctness, and two-way auditability — not readability. An absorption or audit memo distills a settled question back into the parent doc's appendix surface. Know which kind you're writing before you pick a sentence — the optimization targets conflict, and mixing them produces docs that read fine but fail their actual audience. The Deliverable Altitude section further down spells out the what-doc / how-doc contrast in detail.
+
 ---
 
 ## Document Types
-
-You write two types of documents. Know which you're writing — it determines everything.
 
 ### Strategy Doc (living)
 
@@ -31,24 +31,27 @@ Lives in `docs/product/`. Defines the north star for a track and the current bes
 - When the path is unclear, state the options and what would resolve them
 - Update after each deliverable with what was actually learned
 
-### Execution Ticket Spec (throwaway)
+### Working Doc
 
-Lives in `docs/working/`. Picks the next step from a strategy doc. Scoped to one deliverable.
+Lives in `docs/working/`. This is where design work actually happens — not a draft, not a throwaway. Working docs are the active surface for scoping, debating, auditing, and landing commitments before code gets written.
 
-**Include:**
-- **Context** — reference to strategy doc, what step this is, why it matters
-- **Scope** — exactly what gets built, nothing more
-- **Contract** — formal definitions, anti-lookahead boundaries, temporal safety
-- **Implementation approach** — technical details, parallel work items identified
-- **Test plan** — deterministic tests that prove correctness
-- **What's explicitly out of scope** — prevents scope creep during implementation
+A working doc comes in one of two altitudes. **Know which you're writing before you draft a sentence.** The Deliverable Altitude section further down spells out the contrast and the specific requirements for each.
 
-**Writing principles:**
-- Each ticket should fit cleanly in one agent's context window
-- Every claim about existing code should be verified — read the code, don't guess
+- **What-doc (scope spec).** Describes *what* to build and *why*. Targets a human engineer who will make judgment calls during implementation. Optimizes for readability, motivational clarity, and the user's ability to scan and steer. Example: the parent refresh or capability spec that commits to a set of architectural choices.
+- **How-doc (execution plan).** Describes *where every change goes* at claude-plan-mode altitude. Targets a code agent executing autonomously plus a code reviewer auditing the code against the plan without re-deriving intent. Optimizes for comprehensiveness, correctness, and two-way auditability — not readability. Example: the sub-memos under a settled what-doc that enumerate file paths, function signatures, caller sites, and exact test assertions for the code-agent track.
+
+Working docs at either altitude can grow richer structures as the work demands them:
+
+- **Spec Development section** (§9-style) for deferred work the doc has decided to file rather than resolve inline. Monotonic-shrink rule applies — items disappear as they land; empty subsection headers get removed entirely. Full rule below.
+- **Appendices section** (§12-style) for sub-memos the doc absorbs. Each appendix follows the distilled paragraph + bulleted takeaways format. Full rule below.
+- **Review History** at the bottom once the doc converges.
+- **Provenance frontmatter** — `title`, `author` (friendly-name + sm-id in backticks + provider + model), `date`.
+
+**Writing principles (common to both altitudes):**
+- Every claim about existing code is verified — read the code, don't guess.
 - Formal contracts > prose descriptions. If it can be stated precisely, state it precisely.
-- Test cases should be deterministic and reproducible
-- Name the input artifacts and output artifacts explicitly
+- Name the input artifacts and output artifacts explicitly.
+- Present tense, as a final artifact — no "earlier draft / previously" narration in the main body (see Writing Rules).
 
 ---
 
@@ -343,76 +346,6 @@ impact and four are implementation detail.
 
 ---
 
-## Absorption-Audit Memos
-
-When the task is to audit an external ticket against an already-settled spec surface (absorption sprints), the memo concludes with one of five outcomes. Name the outcome explicitly in the TL;DR:
-
-- **A (straight absorb).** Ticket scope aligns with refresh architecture; how-doc picks it up unchanged at existing §N location. Memo validates the route with footnoted evidence; no main-doc §10 edit. Close ticket on memo merge.
-- **A-with-obviation.** Refresh commitments structurally obviate the ticket's problem (hot path gone, consumer migrated, architecture shifted). Memo documents the caller / consumer inventory showing the obviation. Close ticket on memo merge.
-- **A-with-hint.** Straight absorb with a minimal main-doc cross-reference (one parenthetical, one sentence) plus §N appendix. Cross-ref is only warranted when there is a named-phrase anchor in the existing main-doc text the appendix is thematically about.
-- **B (new §10 or §9).** Genuine gap the how-doc cannot route around. Memo proposes specific §10 Epic Deliverable or §9 spec-dev item with a **strong finding** — not "we noticed a gap," but "the how-doc cannot pick this up cleanly because X."
-- **Orthogonal close.** Investigation concludes the ticket's work is still required but is not structurally tied to the refresh. No main-doc delta at all. Ticket stays open under its own scope; sub-PR closed without merging. TL;DR carried forward as a ticket comment so the analysis is preserved.
-
-**Default to A.** Don't invent new §10 items unless you can name a concrete blocker. A dispatch that frames the task as neutral between outcomes biases toward §10 expansion. Owner proposing Outcome B without a concrete named blocker is blocking — "the refresh doesn't explicitly mention X" is a theoretical gap, not a blocker. The bar is "here is a specific how-doc-agent behaviour that would go wrong without an explicit hook."
-
-### Null result lives in the appendix alone
-
-When an absorption concludes "no §10 change required," the null result lives in a §N appendix and nothing else. Adding a main-doc sentence that restates the null is noise; the §N TOC flow is the discoverability path. A parenthetical cross-reference (A-with-hint) is only warranted when the main doc carries a named-phrase anchor the appendix is thematically about.
-
-**Don't write (synthetic anchor):**
-```
-§10.8 five-surgical-changes list closes with:
-> "No sixth surgical change for `EventStore.get_events` indexing is filed
-> here — §12.14's caller-surface audit confirms the remaining consumers
-> are either on the #2822 fast path, orphaned, or cold by design.
-> [from #2834]"
-```
-
-This restates the null result as a full sentence in the main doc. §12.14 already carries the null cleanly. The sentence is main-doc noise.
-
-**Do write:** remove the paragraph entirely. §N TOC flow is the discoverability path.
-
-**Correct cross-reference example (§10.10 case):**
-```
-§10.10 perf-envelope paragraph already reads:
-> "Hitting the ≤ +0.10 absolute-slope target implies an implementation-level
-> investigation of the hot-spot trackers driving the current N^1.19 scaling
-> (event-store append path, leg-registry growth, prune expungement scan,
-> or elsewhere)..."
-
-Corrected insertion — minimal parenthetical after the named phrase:
-> "...(event-store append path, leg-registry growth (§12.13), prune expungement
-> scan, or elsewhere)..."
-```
-
-The anchor phrase `leg-registry growth` is already in §10.10 and §12.13 is thematically about exactly that phrase. The cross-reference adds one token without restating anything.
-
-### TL;DR above §1 for user-readable entry
-
-The user reads the memo end-to-end for clarity and main-doc scope, separately from the reviewer's standing-rule pass. Draft a TL;DR block above §1 that is answerable in one pass by a reader without sprint context — the outcome (A / A-with-obviation / A-with-hint / B / orthogonal), the one-sentence reason, and the main-doc delta (if any). User comments on memo readability are classified under the same Valid / Invalid / Partially valid protocol as reviewer findings.
-
-### Orthogonal-close: TL;DR as ticket comment
-
-When an absorption sub-doc concludes orthogonal (nothing ships to main doc), the sub-PR closes without merging and the memo's TL;DR lands as a comment on the original ticket so the ticket is resumable from its own thread.
-
-**Comment shape:**
-```markdown
-**Investigation outcome (PR #XXXX, closed without merging — orthogonal to
-#<parent>):**
-
-[TL;DR paragraph verbatim from the memo, with "Close #YYYY on memo merge"
-language removed or adapted]
-
-**Per user decision YYYY-MM-DD:** work is tracked here independently of
-#<parent>. Ticket remains open. Investigation memo reachable at PR #XXXX
-(closed, not merged) for the full argument — TL;DR, alignment analysis,
-concrete migration substrate + live gap, and any working-template references.
-```
-
-The closed PR branch gets deleted in sprint wrap-up; GitHub's immutable PR ref preserves the memo's content regardless.
-
----
-
 ## Protocol-Compliant Explicit `sm send` on Every State Change
 
 Every revision push / convergence reached / findings posted / merge completed must trigger an explicit `sm send` to the pair counterpart AND orchestrator. Silent completion inside the agent's shell — stdout only, tmux output only, or a PR comment without an accompanying sm send — is a failure mode.
@@ -451,17 +384,26 @@ Multi-recipient syntax `sm send id1,id2 "msg"` is the standard pattern — singl
 
 Know which altitude you're writing at. A misread here produces memos that look fine to the user but are unusable for their actual downstream audience.
 
-### Scope spec (what + why)
+### What-doc (scope spec)
 
-Describes **what** to build and **why**. Targets a human engineer making judgment calls during implementation. Optimizes for readability and motivational clarity. The spec says "implement a unified fib-resolution handle over `EventStore.StructuralEvent`"; the engineer decides the exact method signatures, where helpers live, and which existing patterns to mirror.
+Describes **what** to build and **why**. Targets a human engineer making judgment calls during implementation. Optimizes for **readability, scannability, and grokking speed** — the user and the engineer should be able to land on any section and extract the claim without close reading. The spec says "implement a unified fib-resolution handle over `EventStore.StructuralEvent`"; the engineer decides the exact method signatures, where helpers live, and which existing patterns to mirror.
 
-- **Default altitude for:** docs/working/ execution-ticket specs, strategy docs, refresh what-docs, investigation memos.
-- **Reader:** human engineer.
-- **Success metric:** engineer can implement without re-interrogating the spec owner.
+- **Default altitude for:** docs/working/ scope specs, strategy docs, refresh what-docs, investigation memos.
+- **Reader:** the user (at validation gates) + a human engineer.
+- **Success metric:** engineer can implement without re-interrogating the spec owner; user can steer without reading the full doc twice.
 
-### Execution plan (where)
+**Readability rules (what-docs only):**
+- **Document-level lede.** Most important idea at the top. A reader who stops after the first paragraph should already know the verdict or main claim.
+- **Section-level lede.** First sentence or paragraph of each section states the core claim plainly. Justifications, footnote cites, and supporting detail come after.
+- **Answer framing questions plainly first.** If the doc answers specific scope questions, the plain answer goes at the top of the relevant section.
+- **Simple active sentences.** Split any sentence with 3+ commas or compound clauses. Prefer "X does Y" over "X, which does Y, is Z."
+- **One idea per paragraph.** More paragraph breaks than you think.
+- **Bullets for enumerations.** Fields, options, capabilities, sources — not comma-chained prose.
+- **Verdicts and gate outcomes surface at section top** with sharp one-sentence answers.
 
-Describes **where every change goes** at claude-plan-mode altitude. Targets a code agent executing autonomously + a code reviewer auditing the code against the plan without re-deriving intent. Optimizes for comprehensiveness, correctness, and auditability — **not** user readability.
+### How-doc (execution plan)
+
+Describes **where every change goes** at claude-plan-mode altitude. Targets a code agent executing autonomously + a code reviewer auditing the code against the plan without re-deriving intent. Optimizes for **comprehensiveness, correctness, and two-way auditability** — **not** user readability. The readability rules above (lede-first, simple active sentences, one-idea-per-paragraph) do not govern how-docs; how-docs win by being exhaustive and precise, even when dense.
 
 - **Default altitude for:** how-doc fan-out sub-memos under an already-settled scope spec; any doc whose downstream reader is an autonomous code agent plus an auditability-focused code reviewer.
 - **Reader:** code agent + code reviewer. The user is typically **not** in the code-review loop.

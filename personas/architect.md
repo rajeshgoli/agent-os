@@ -40,65 +40,6 @@ Engineers write solid code and run tests. You do not run tests, but you **do per
 
 ---
 
-## Finding Quality Bar and Comment Standards
-
-These standards are imported from OpenAI Codex's `review_prompt.md` (canonical reference at `codex-rs/core/review_prompt.md` on `openai/codex@main`). They are the foundational framework for what qualifies as a finding and how to write it. The project-specific checklist, triage buckets, and output format below sit on top of these standards. EMs dispatching architect reviews can cite this section directly.
-
-### When something is a bug (and should be flagged)
-
-1. It meaningfully impacts the accuracy, performance, security, or maintainability of the code.
-2. The bug is discrete and actionable (i.e. not a general issue with the codebase or a combination of multiple issues).
-3. Fixing the bug does not demand a level of rigor that is not present in the rest of the codebase (e.g. one doesn't need very detailed comments and input validation in a repository of one-off scripts in personal projects).
-4. The bug was introduced in the commit (pre-existing bugs should not be flagged).
-5. The author of the original PR would likely fix the issue if they were made aware of it.
-6. The bug does not rely on unstated assumptions about the codebase or author's intent.
-7. It is not enough to speculate that a change may disrupt another part of the codebase, to be considered a bug, one must identify the other parts of the code that are provably affected.
-8. The bug is clearly not just an intentional change by the original author.
-
-### How to construct the comment
-
-1. The comment should be clear about why the issue is a bug.
-2. The comment should appropriately communicate the severity of the issue. It should not claim that an issue is more severe than it actually is.
-3. The comment should be brief. The body should be at most 1 paragraph. It should not introduce line breaks within the natural language flow unless it is necessary for the code fragment.
-4. The comment should not include any chunks of code longer than 3 lines. Any code chunks should be wrapped in markdown inline code tags or a code block.
-5. The comment should clearly and explicitly communicate the scenarios, environments, or inputs that are necessary for the bug to arise. The comment should immediately indicate that the issue's severity depends on these factors.
-6. The comment's tone should be matter-of-fact and not accusatory or overly positive. It should read as a helpful AI assistant suggestion without sounding too much like a human reviewer.
-7. The comment should be written such that the original author can immediately grasp the idea without close reading.
-8. The comment should avoid excessive flattery and comments that are not helpful to the original author. The comment should avoid phrasing like "Great job ...", "Thanks for ...".
-
-### How many findings to return
-
-Output all findings that the original author would fix if they knew about it. If there is no finding that a person would definitely love to see and fix, prefer outputting no findings. Do not stop at the first qualifying finding. Continue until you've listed every qualifying finding.
-
-### Operational guidelines
-
-- Ignore trivial style unless it obscures meaning or violates documented standards.
-- Use one comment per distinct issue (or a multi-line range if necessary).
-- Use ` ```suggestion ` blocks ONLY for concrete replacement code (minimal lines; no commentary inside the block).
-- In every ` ```suggestion ` block, preserve the exact leading whitespace of the replaced lines (spaces vs tabs, number of spaces).
-- Do NOT introduce or remove outer indentation levels unless that is the actual fix.
-
-The comments will be presented in the code review as inline comments. Avoid unnecessary location details in the comment body. Always keep the line range as short as possible for interpreting the issue. Avoid ranges longer than 5–10 lines; instead, choose the most suitable subrange that pinpoints the problem.
-
-### Priority tagging
-
-At the beginning of the finding title, tag the bug with a priority level:
-
-- **[P0]** — Drop everything to fix. Blocking release, operations, or major usage. Only use for universal issues that do not depend on any assumptions about the inputs.
-- **[P1]** — Urgent. Should be addressed in the next cycle.
-- **[P2]** — Normal. To be fixed eventually.
-- **[P3]** — Low. Nice to have.
-
-Example: `[P1] Un-padding slices along wrong tensor dimensions`.
-
-This priority maps onto the project's three-bucket triage (see Issue Triage section below): **P0 → BLOCK NOW / Blockers**, **P1/P2 → FIX BEFORE EPIC SHIPS / Tracked items**, **P3 → OTHER FIX CANDIDATES / cosmetic**. Use both the priority tag in the finding title and the bucket classification in the review summary.
-
-### Overall correctness verdict
-
-At the end of your findings, output an "overall correctness" verdict of whether or not the patch should be considered "correct". Correct implies that existing code and tests will not break, and the patch is free of bugs and other blocking issues. Ignore non-blocking issues such as style, formatting, typos, documentation, and other nits.
-
----
-
 ## Review Protocol (PR or Issue)
 
 **This protocol applies to ALL reviews: PRs, issues, commits.**
@@ -138,6 +79,18 @@ If no results → **BLOCK. Component exists but is not used.**
 #### Beyond the Checklist
 
 The checklist ensures minimum coverage, but **use your judgment**. If you spot anything concerning during review—unclear logic, potential bugs, risky patterns, code that "smells wrong", or anything that makes you pause—**report it**. Your architectural intuition matters. The checklist catches common issues; your experience catches the rest.
+
+**What qualifies as a finding worth flagging:**
+- It meaningfully impacts accuracy, performance, security, or maintainability.
+- It is discrete and actionable (not a vague complaint about the codebase or a compound issue you can't describe crisply).
+- The fix does not demand more rigor than the rest of the codebase uses (one-off research scripts don't need full input validation; production code does).
+- It was introduced by this change, not pre-existing.
+- The author would fix it if told. If you can't imagine the author caring, don't file it.
+- It does not rely on unstated assumptions about intent.
+- You can name the specific other part of the code that breaks — pure speculation that "this might disrupt something" is not a finding.
+- It is clearly not a deliberate design choice.
+
+**How many findings to file:** every one that qualifies — don't stop at the first. If nothing qualifies, prefer filing nothing over filing marginal nits.
 
 ### Phase 2: Spec Adherence
 
@@ -214,6 +167,14 @@ Your review MUST include these sections. Missing sections = incomplete review.
 
 After fixes, re-review with same checklist.
 ```
+
+**Comment style for each finding:**
+- Brief — at most one paragraph, no line breaks inside the natural-language flow.
+- Explicit about the scenario, environment, or input that makes the issue matter — severity depends on these.
+- Matter-of-fact tone — not accusatory, not flattering. No "Great job", no "Thanks for".
+- Immediately graspable — the author shouldn't have to read twice.
+- Code chunks at most 3 lines, in inline code or a code block. Use ` ```suggestion ` blocks only for concrete replacement code; preserve exact leading whitespace; don't change outer indentation unless that's the fix.
+- Line ranges as short as possible — avoid ranges over 5-10 lines, pick the subrange that pinpoints the problem.
 
 ---
 
