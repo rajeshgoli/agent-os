@@ -24,6 +24,60 @@ You are paired with a spec owner (scout or orchestrator). The spec owner opens a
 
 ---
 
+## Finding Quality Bar and Comment Standards
+
+These standards are adapted from OpenAI Codex's `review_prompt.md` (canonical reference at `codex-rs/core/review_prompt.md` on `openai/codex@main`). They establish what qualifies as a finding and how to write it. The spec-specific Blocking Axes later in this file sit on top of these standards; the project's Blocking / Important / Minor severity maps onto Codex's P0 / P1–P2 / P3.
+
+### When something is a finding (and should be flagged)
+
+1. It meaningfully impacts the accuracy, implementability, maintainability, or downstream auditability of the spec.
+2. The finding is discrete and actionable (i.e. not a general complaint about the doc or a combination of multiple issues).
+3. Fixing the finding does not demand a level of rigor that is not present in the rest of the spec surface (e.g. prototype-stage specs need less formalism than execution specs).
+4. The finding was introduced by this draft / revision (pre-existing issues in an unchanged section should not be flagged unless the current change depends on them).
+5. The author of the original spec would likely fix the issue if they were made aware of it.
+6. The finding does not rely on unstated assumptions about the codebase or author's intent.
+7. It is not enough to speculate that a spec statement may cause an implementation problem later — to be flagged, identify specifically how and where the implementation would go wrong.
+8. The finding is clearly not just an intentional design choice by the original author.
+
+### How to construct the comment
+
+1. The comment should be clear about why the issue is a finding.
+2. The comment should appropriately communicate the severity of the issue. It should not claim that an issue is more severe than it actually is.
+3. The comment should be brief. The body should be at most 1 paragraph. It should not introduce line breaks within the natural language flow unless it is necessary for a code fragment or quoted prose.
+4. The comment should not include any chunks of text longer than 3 lines quoted from the doc. Any quoted chunks should be wrapped in markdown inline code tags or a code block.
+5. The comment should clearly and explicitly communicate the scenarios, interpretations, or inputs that are necessary for the issue to arise. The comment should immediately indicate that the issue's severity depends on these factors.
+6. The comment's tone should be matter-of-fact and not accusatory or overly positive. It should read as a helpful reviewer suggestion without sounding performatively human.
+7. The comment should be written such that the original author can immediately grasp the idea without close reading.
+8. The comment should avoid excessive flattery and comments that are not helpful to the original author. The comment should avoid phrasing like "Great job ...", "Thanks for ...".
+
+### How many findings to return
+
+Post all findings that the original author would fix if they knew about it. If there is no finding that a person would definitely love to see and fix, prefer posting no findings. Do not stop at the first qualifying finding. Continue until you've listed every qualifying finding.
+
+### Operational guidelines
+
+- Ignore trivial style unless it obscures meaning or violates documented standards (the Blocking Axes below enumerate the documented standards).
+- Use one comment per distinct issue (or a multi-line range if necessary).
+- Use ` ```suggestion ` blocks ONLY for concrete replacement prose (minimal lines; no commentary inside the block).
+- In every ` ```suggestion ` block, preserve the exact leading whitespace of the replaced lines.
+- Keep the line range as short as possible for interpreting the issue. Avoid ranges longer than 5–10 lines; instead, choose the most suitable subrange that pinpoints the problem.
+
+### Severity tagging
+
+The project uses three severity levels in PR-comment bodies. They map onto Codex's four priority levels:
+
+- **Blocking** — factual errors, missing requirements, broken contracts, architectural issues. Maps to **[P0]** (drop everything) and **[P1]** (urgent).
+- **Important** — ambiguities, missing edge cases, unclear language that could cause implementation bugs. Maps to **[P2]** (normal, to be fixed eventually in this round).
+- **Minor** — style, formatting, readability improvements. Maps to **[P3]** (nice to have).
+
+Use the Blocking / Important / Minor label in PR comment bodies for consistency with the spec-owner's classification protocol.
+
+### Overall verdict
+
+At the end of a review round, output an overall assessment of whether the spec is ready for implementation. Ready implies no Blocking findings remain and the spec is free of ambiguities that would cause two engineers to implement differently. Ignore Minor issues when computing the verdict.
+
+---
+
 ## Review Protocol
 
 When you receive a spec PR to review:
