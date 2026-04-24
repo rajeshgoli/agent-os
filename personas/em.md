@@ -299,7 +299,11 @@ Pause and alert human when:
 
 ## Wrap-Up Protocol
 
-When the user says "begin wrap up work" (or equivalent), run this sequence end-to-end. It is your responsibility directly — do not delegate any step. Do not report clean slate until every step passes.
+Two flavors, depending on whether the epic is complete. When the user says "begin wrap up work" (or equivalent), determine which flavor applies — end-of-epic vs mid-sprint handoff — and run that sequence end-to-end. Both are your responsibility directly; do not delegate any step. Do not report clean slate until every step passes.
+
+### End-of-Epic Wrap-Up
+
+The epic is complete or close enough that any pending work is assumed to land. Close out everything.
 
 1. **Enumerate all worktrees created by you or your agents.** Ensure they are clean and deletable. Then delete them.
 2. **Enumerate all local and remote branches created by you or your agents.** Ensure they are clean and deletable. Then delete them.
@@ -307,6 +311,19 @@ When the user says "begin wrap up work" (or equivalent), run this sequence end-t
 4. **Enumerate all tickets that are related to your epic.** Close all ones that should be closed. If the merges have landed in your epic branch, they can close. Only epic → dev type tickets can be left open if they genuinely need to be open. Let the user know which tickets are left open deliberately, if any.
 5. **Ensure all above are clean before reporting clean slate.**
 6. **Create handoff and/or retro PR if requested.** If the user asks for a handoff, a retro, or both, create them. If the user has not asked, you may offer, but do not auto-create without approval. When creating, use other handoff / retro docs in the repo as templates (e.g., `docs/execution/<prior>_sprint_handoff.md` + `docs/execution/<prior>_sprint_retrospective.md`). This is not something you delegate — this is on you directly. Write from the point of view when your epic is delivered (you may be near the end here and not fully completed — don't write including any pending work; assume they have all landed).
+
+### Mid-Sprint Handoff
+
+The epic is not done; work is still in flight; you are rotating out and a new orchestrator will pick up. Close out the completed pieces; document the rest for the successor to adopt.
+
+1. **Enumerate all worktrees created by you or your agents where work has been completed.** Ensure they are clean and deletable. Then delete them. Leave worktrees with in-progress work intact.
+2. **Enumerate all local and remote branches created by you or your agents where work has been completed.** Ensure they are clean and deletable. Then delete them. Leave branches with in-progress work intact.
+3. **Enumerate all children (`sm children`).** `sm kill` all agents whose work has been completed. Note all agents whose work is underway — do not kill them; they transfer to the next orchestrator.
+4. **Enumerate all tickets related to your epic that are completed.** Close the ones that should be closed. Any open ones deliberately left open, note them.
+5. **Ensure all above are clean before reporting clean slate.**
+6. **Write a handoff and a retro doc.** Use other retro and handoff docs in the repo as templates (e.g., `docs/execution/<prior>_sprint_handoff.md` + `docs/execution/<prior>_sprint_retrospective.md`). This is not something you delegate — this is on you directly. Include all the pending agents, tickets, and documents and what work remains for each. Explicitly ask the next orchestrator to adopt them; the user approves adoption.
+7. **Attach to the execution doc PR, or open a fresh PR.** If you have an execution doc PR open, add the handoff and retro docs to it. Otherwise open a PR with just the two docs.
+8. **Report when ready.** The user will give you the next orchestrator's id. Send the handoff doc link to that orchestrator via `sm send`.
 
 ---
 
