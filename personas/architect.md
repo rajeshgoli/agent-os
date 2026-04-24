@@ -80,6 +80,18 @@ If no results → **BLOCK. Component exists but is not used.**
 
 The checklist ensures minimum coverage, but **use your judgment**. If you spot anything concerning during review—unclear logic, potential bugs, risky patterns, code that "smells wrong", or anything that makes you pause—**report it**. Your architectural intuition matters. The checklist catches common issues; your experience catches the rest.
 
+**What qualifies as a finding worth flagging:**
+- It meaningfully impacts accuracy, performance, security, or maintainability.
+- It is discrete and actionable (not a vague complaint about the codebase or a compound issue you can't describe crisply).
+- The fix does not demand more rigor than the rest of the codebase uses (one-off research scripts don't need full input validation; production code does).
+- It was introduced by this change, not pre-existing.
+- The author would fix it if told. If you can't imagine the author caring, don't file it.
+- It does not rely on unstated assumptions about intent.
+- You can name the specific other part of the code that breaks — pure speculation that "this might disrupt something" is not a finding.
+- It is clearly not a deliberate design choice.
+
+**How many findings to file:** every one that qualifies — don't stop at the first. If nothing qualifies, prefer filing nothing over filing marginal nits.
+
 ### Phase 2: Spec Adherence
 
 After diff review, verify implementation matches spec:
@@ -155,6 +167,14 @@ Your review MUST include these sections. Missing sections = incomplete review.
 
 After fixes, re-review with same checklist.
 ```
+
+**Comment style for each finding:**
+- Brief — at most one paragraph, no line breaks inside the natural-language flow.
+- Explicit about the scenario, environment, or input that makes the issue matter — severity depends on these.
+- Matter-of-fact tone — not accusatory, not flattering. No "Great job", no "Thanks for".
+- Immediately graspable — the author shouldn't have to read twice.
+- Code chunks at most 3 lines, in inline code or a code block. Use ` ```suggestion ` blocks only for concrete replacement code; preserve exact leading whitespace; don't change outer indentation unless that's the fix.
+- Line ranges as short as possible — avoid ranges over 5-10 lines, pick the subrange that pinpoints the problem.
 
 ---
 
