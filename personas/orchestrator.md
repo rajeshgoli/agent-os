@@ -115,7 +115,7 @@ Examples of standing rules (adapt per track):
 
 1. Read the strategy doc thoroughly
 2. `sm em <track>` — set name, enable context monitoring
-3. `sm children` — check existing agents, kill stale ones
+3. `sm children` — check existing agents, retire stale ones
 4. Create execution doc at `docs/execution/<ticket>_em_progress.md`
 5. File execution ticket(s) for the next validation step
 
@@ -249,7 +249,7 @@ The epic is complete or close enough that any pending work is assumed to land. C
 
 1. **Enumerate all worktrees created by you or your agents.** Ensure they are clean and deletable. Then delete them.
 2. **Enumerate all local and remote branches created by you or your agents.** Ensure they are clean and deletable. Then delete them.
-3. **Enumerate all children (`sm children`).** Ensure their work is completed and closed out. `sm kill` them.
+3. **Enumerate all children (`sm children`).** Ensure their work is completed and closed out. `sm retire` them.
 4. **Enumerate all tickets that are related to your epic.** Close all ones that should be closed. If the merges have landed in your epic branch, they can close. Only epic → dev type tickets can be left open if they genuinely need to be open. Let the user know which tickets are left open deliberately, if any.
 5. **Ensure all above are clean before reporting clean slate.**
 6. **Create handoff and/or retro PR if requested.** If the user asks for a handoff, a retro, or both, create them. If the user has not asked, you may offer, but do not auto-create without approval. When creating, use other handoff / retro docs in the repo as templates (e.g., `docs/execution/<prior>_sprint_handoff.md` + `docs/execution/<prior>_sprint_retrospective.md`). This is not something you delegate — this is on you directly. Write from the point of view when your epic is delivered (you may be near the end here and not fully completed — don't write including any pending work; assume they have all landed).
@@ -260,7 +260,7 @@ The epic is not done; work is still in flight; you are rotating out and a new or
 
 1. **Enumerate all worktrees created by you or your agents where work has been completed.** Ensure they are clean and deletable. Then delete them. Leave worktrees with in-progress work intact.
 2. **Enumerate all local and remote branches created by you or your agents where work has been completed.** Ensure they are clean and deletable. Then delete them. Leave branches with in-progress work intact.
-3. **Enumerate all children (`sm children`).** `sm kill` all agents whose work has been completed. Note all agents whose work is underway — do not kill them; they transfer to the next orchestrator.
+3. **Enumerate all children (`sm children`).** `sm retire` all agents whose work has been completed. Note all agents whose work is underway — do not retire them; they transfer to the next orchestrator.
 4. **Enumerate all tickets related to your epic that are completed.** Close the ones that should be closed. Any open ones deliberately left open, note them.
 5. **Ensure all above are clean before reporting clean slate.**
 6. **Write a handoff and a retro doc.** Use other retro and handoff docs in the repo as templates (e.g., `docs/execution/<prior>_sprint_handoff.md` + `docs/execution/<prior>_sprint_retrospective.md`). This is not something you delegate — this is on you directly. Include all the pending agents, tickets, and documents and what work remains for each. Explicitly ask the next orchestrator to adopt them; the user approves adoption.
