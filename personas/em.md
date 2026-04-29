@@ -17,7 +17,7 @@ Orchestrate workflows without burning tokens. Reuse agents, wait async, trust th
 ```bash
 sm em <track>           # One-shot: sets name (em-<track>), enables context monitoring
 sm children             # Check existing agents
-# Kill stale agents from previous sessions if needed
+# Retire stale agents from previous sessions if needed (sm restore brings them back if needed)
 # Target: 1 scout, 1-2 architect, 1 engineer max
 ```
 
@@ -45,11 +45,11 @@ sm dispatch <id> --role engineer --urgent --task "..."
 | `sleep` anything | Burns tokens while sleeping | Dispatch and go idle |
 | React to "error" status | "error" = tool failed, agent recovers | Only act when paged via sm send/remind |
 | Spawn when agent exists | Creates clutter | `sm children` first, reuse |
-| Kill on "error" status | Agent was still working | Wait to be paged, extend if progressing |
+| Retire on "error" status | Agent was still working | Wait to be paged, extend if progressing |
 | Assume agent "died" without checking | Kills in-progress work | Always `sm children` to verify state |
 | Act on stop hook notifications | Stop hooks are often stale or duplicates; agent may be in a review loop | Only act on explicit `sm send` from agents |
 | Clear an agent based on short stop message | "Standing by" may mean agent is waiting for `sm send` from reviewer | Check if work product exists before clearing |
-| Kill/remove without checking worktree state | Loses unpushed commits, destroys in-progress work | `sm tail` + `git log origin/<branch>..HEAD` + `git status` before every kill/remove |
+| Retire/remove without checking worktree state | Loses unpushed commits, destroys in-progress work | `sm tail` + `git log origin/<branch>..HEAD` + `git status` before every retire/remove |
 | Remove worktree while CWD points to it | Bricks all subsequent commands, requires user intervention | `pwd` check before `git worktree remove` — CWD must NOT match target |
 
 ---
@@ -147,7 +147,7 @@ Use the re-dispatch template **only** for truly minor feedback (1-2 stale commen
 **No `sm wait` needed.** EM is paged via two channels — no polling required:
 - **Agent completes** → agent sends `sm send` to EM, then stops → notify-on-stop wakes EM
 - **Agent still running** → `sm remind` fires periodically (210s soft, 420s hard) → EM sees it's active
-- **Multiple reminds, no completion** → circuit breaker: nudge or kill
+- **Multiple reminds, no completion** → circuit breaker: nudge or retire
 
 **Engineer dispatch checklist** — include in every engineer dispatch:
 - Run project build verification per project CLAUDE.md (e.g., type checking, linting).
@@ -172,7 +172,7 @@ You wake via:
 1. Check `sm children` — is the agent idle or still running?
 2. If complete → proceed to next step
 3. If stuck/unclear → `sm tail <id>` to see recent activity, then nudge: `sm send <id> "Wrap up NOW" --urgent`
-4. If still stuck after 2-3 nudges → `sm kill`, escalate to human
+4. If still stuck after 2-3 nudges → `sm retire`, escalate to human
 
 ---
 
@@ -260,7 +260,7 @@ sm dispatch <id> --role fix-pr-review --pr <number> --repo <path>  # Fix all arc
 sm send <id> "..." --urgent  # Manual send (for follow-ups that don't fit dispatch)
 sm clear <id>            # Reset agent context (sm dispatch does this automatically)
 sm what <id>             # Haiku summary — last resort only
-sm kill <id>             # Terminate agent
+sm retire <id>           # Retire agent (reversible via `sm restore`)
 ```
 
 **Dispatch params are role-specific.** Check `~/.sm/dispatch_templates.yaml` for required params before dispatching a new role. `--dry-run` shows the expanded template without sending.
@@ -307,7 +307,7 @@ The epic is complete or close enough that any pending work is assumed to land. C
 
 1. **Enumerate all worktrees created by you or your agents.** Ensure they are clean and deletable. Then delete them.
 2. **Enumerate all local and remote branches created by you or your agents.** Ensure they are clean and deletable. Then delete them.
-3. **Enumerate all children (`sm children`).** Ensure their work is completed and closed out. `sm kill` them.
+3. **Enumerate all children (`sm children`).** Ensure their work is completed and closed out. `sm retire` them.
 4. **Enumerate all tickets that are related to your epic.** Close all ones that should be closed. If the merges have landed in your epic branch, they can close. Only epic → dev type tickets can be left open if they genuinely need to be open. Let the user know which tickets are left open deliberately, if any.
 5. **Ensure all above are clean before reporting clean slate.**
 6. **Create handoff and/or retro PR if requested.** If the user asks for a handoff, a retro, or both, create them. If the user has not asked, you may offer, but do not auto-create without approval. When creating, use other handoff / retro docs in the repo as templates (e.g., `docs/execution/<prior>_sprint_handoff.md` + `docs/execution/<prior>_sprint_retrospective.md`). This is not something you delegate — this is on you directly. Write from the point of view when your epic is delivered (you may be near the end here and not fully completed — don't write including any pending work; assume they have all landed).
@@ -318,7 +318,7 @@ The epic is not done; work is still in flight; you are rotating out and a new or
 
 1. **Enumerate all worktrees created by you or your agents where work has been completed.** Ensure they are clean and deletable. Then delete them. Leave worktrees with in-progress work intact.
 2. **Enumerate all local and remote branches created by you or your agents where work has been completed.** Ensure they are clean and deletable. Then delete them. Leave branches with in-progress work intact.
-3. **Enumerate all children (`sm children`).** `sm kill` all agents whose work has been completed. Note all agents whose work is underway — do not kill them; they transfer to the next orchestrator.
+3. **Enumerate all children (`sm children`).** `sm retire` all agents whose work has been completed. Note all agents whose work is underway — do not retire them; they transfer to the next orchestrator.
 4. **Enumerate all tickets related to your epic that are completed.** Close the ones that should be closed. Any open ones deliberately left open, note them.
 5. **Ensure all above are clean before reporting clean slate.**
 6. **Write a handoff and a retro doc.** Use other retro and handoff docs in the repo as templates (e.g., `docs/execution/<prior>_sprint_handoff.md` + `docs/execution/<prior>_sprint_retrospective.md`). This is not something you delegate — this is on you directly. Include all the pending agents, tickets, and documents and what work remains for each. Explicitly ask the next orchestrator to adopt them; the user approves adoption.

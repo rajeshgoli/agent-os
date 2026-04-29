@@ -135,7 +135,7 @@ The required pattern is: file it, fix it, PR it, continue working locally, and r
 
 Keep the lane clean:
 
-1. Kill idle researchers that have already reported back.
+1. Retire idle researchers that have already reported back.
 2. Remove stale or completed worktrees after archiving the idea code.
 3. Keep queue state, registry state, and archive state aligned.
 
