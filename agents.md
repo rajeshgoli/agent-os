@@ -51,11 +51,13 @@ When working with another agent, follow these rules:
 
 The host is one 18 GB Mac shared by every agent. Run heavy work — test suites, benchmarks, replay sweeps, corpus/fixture prep — via `sm queue run`, never directly. SM arbitrates admission and wakes you on completion.
 
-Pick a type:
+Pick a type by output shape:
 
-- `--type tests` — test suites; limited parallelism.
-- `--type perf` — benchmarks/replays; serialized with cooldown for clean timings.
-- `--type background` — corpus/fixture prep; may be preempted by `perf`.
+- `--type tests` — content-deterministic outputs (test suites, parity/hash verifiers); parallel-safe.
+- `--type perf` — wall-time-derived outputs (benchmarks, latency); serialized with cooldown for clean timing.
+- `--type background` — long content-producing work safe to retry (fixtures, corpus); preemptable by `perf`.
+
+The queue admits one `perf` job at a time but does not bound parallelism inside it — `pytest -n 4` workers still fight each other; use `@pytest.mark.serial` or `-n 0` for timing-sensitive tests.
 
 ```bash
 sm queue run --type tests -- python -m pytest tests/unit -q
