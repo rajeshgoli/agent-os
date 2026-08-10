@@ -59,9 +59,15 @@ one that must not have it. Check that it is a symlink into `agent-os` before tou
 real global `CLAUDE.md` is never deleted:
 
 ```bash
-[ -L ~/.claude/CLAUDE.md ] && readlink ~/.claude/CLAUDE.md    # only proceed if this names agent-os
-rm ~/.claude/CLAUDE.md
+case "$(readlink ~/.claude/CLAUDE.md 2>/dev/null)" in
+  *agent-os*) rm ~/.claude/CLAUDE.md && echo "removed legacy agent-os symlink" ;;
+  *)          echo "left alone: absent, a real file, or pointing somewhere else" ;;
+esac
 ```
+
+The check and the removal are one statement on purpose. A validating command on one line and an
+unconditional `rm` on the next reads as a guard and is not one — the `rm` runs whatever the check
+printed.
 
 ## The main project does not use this
 
