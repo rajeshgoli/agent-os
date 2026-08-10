@@ -18,6 +18,12 @@ designing a multi-agent plan for one of these repos, you have misread the size o
 three agents in parallel is the practical ceiling, and they should be decoupled well enough that
 coordination is a single message when a PR lands.
 
+**Parallel agents never share a checkout.** Each works in its own worktree on its own branch.
+Picking non-overlapping tickets is not enough: agents in one checkout share the index, HEAD, and
+the current branch, so one agent's checkout or commit silently absorbs or discards another's work
+regardless of how unrelated the tickets are. If a worktree is not an option, serialize — one agent
+touching the repo at a time.
+
 ---
 
 ## 1. Talking to Rajesh
