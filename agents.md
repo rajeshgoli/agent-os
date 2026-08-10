@@ -47,16 +47,22 @@ does not have your context loaded.
    *before* writing the full implementation. Writing the whole change and then discovering the
    basic path does not work is the most common way to waste a cycle here.
 3. **Implement**, matching existing patterns in the repo.
-4. **Build, install, and restart the thing** in its real location, then tell him it is ready to
+4. **Write tests and run the suite.** New behaviour and bug fixes get test coverage, and the
+   repo's test command runs green before anything is deployed or reviewed. His smoke test exercises
+   the path he is thinking about; it cannot catch a regression somewhere else, so it is not a
+   substitute for the suite. If you hit a failure that looks pre-existing or unrelated, do not
+   silently skip it — file an issue with the test name, the assertion, and whether it predates your
+   change, and reference it in your PR.
+5. **Build, install, and restart the thing** in its real location, then tell him it is ready to
    test. The specifics are in each repo's own `AGENTS.md`.
-5. **Wait for his verification.** He tests it himself — physically, in the app, on the device.
+6. **Wait for his verification.** He tests it himself — physically, in the app, on the device.
    Iterate on his feedback until he signs off. He will waive this step explicitly when there is
    nothing to check or he is unavailable; do not assume the waiver.
-6. **Open the PR** once he has signed off.
-7. **Run the review loop** below until it exits.
-8. **Squash merge**, then delete the branch and any worktree.
-9. **Rebuild and restart** if anything changed since step 4, clean up stale builds and binaries,
-   and report the repo is clean.
+7. **Open the PR** once he has signed off.
+8. **Run the review loop** below until it exits.
+9. **Squash merge**, then delete the branch and any worktree.
+10. **Rebuild and restart** if anything changed since step 5, clean up stale builds and binaries,
+    and report the repo is clean.
 
 ---
 
@@ -120,12 +126,15 @@ useful status; "fixed" when you have only unblocked is not.
 and move on.** File it in `rajeshgoli/session-manager`, then reach the maintainer directly:
 
 ```bash
-sm lookup maintainer          # resolves the seated maintainer's session id
+sm roster                     # authoritative: shows which roles are actually seated
+sm lookup <role>              # resolves that role to a session id
 sm send <session-id> 'short description + the issue link'
 ```
 
-`sm roster` lists the registered roles if the lookup comes back empty. A workaround that stays in
-your context is a bug nobody else knows about, and the next agent hits it too.
+Read the roster first and use the role name it shows. Role keys drift — stale registrations can
+resolve to a session that is no longer the seated maintainer, so a lookup that returns *something*
+is not proof you reached the right seat. A workaround that stays in your context is a bug nobody
+else knows about, and the next agent hits it too.
 
 Other things specific to this repo: the server is Rust, and the Python CLI is an older
 implementation — do not treat it as current. Restart with `launchctl`. Control surfaces belong in
