@@ -53,6 +53,16 @@ to every project at once. It is now wrong: these rules describe small single-age
 global symlink would apply them to `fractal-algo-rust`, which has its own and very different
 contract. Wire it per repo.
 
+If a machine still has that symlink from the old setup, remove it — not creating it is not the
+same as it being gone, and a stale one keeps loading this contract into every repo including the
+one that must not have it. Check that it is a symlink into `agent-os` before touching it, so a
+real global `CLAUDE.md` is never deleted:
+
+```bash
+[ -L ~/.claude/CLAUDE.md ] && readlink ~/.claude/CLAUDE.md    # only proceed if this names agent-os
+rm ~/.claude/CLAUDE.md
+```
+
 ## The main project does not use this
 
 `fractal-algo-rust` carries its own self-contained `AGENTS.md` at its repo root, with no submodule
