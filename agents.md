@@ -70,7 +70,10 @@ does not have your context loaded.
    get it re-checked rather than treating the earlier signoff as still valid. Merging on an
    unverified repair can ship a defect worse than the one it fixed.
 9. **Squash merge**, then delete the branch and any worktree.
-10. **Rebuild and restart** if anything changed since step 5, clean up stale builds and binaries,
+10. **Return the persistent checkout to the default branch and pull.** Merging from a worktree
+    leaves it sitting at its pre-merge commit, so the next ticket branches from code that is
+    missing the change you just landed.
+11. **Rebuild and restart** if anything changed since step 5, clean up stale builds and binaries,
     and report the repo is clean.
 
 ---
