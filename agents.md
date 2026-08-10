@@ -59,7 +59,11 @@ does not have your context loaded.
    Iterate on his feedback until he signs off. He will waive this step explicitly when there is
    nothing to check or he is unavailable; do not assume the waiver.
 7. **Open the PR** once he has signed off.
-8. **Run the review loop** below until it exits.
+8. **Run the review loop** below until it exits. **A review fix is new code.** It lands after the
+   suite ran in step 4 and after he signed off in step 6, so neither covers it: re-run the suite
+   before merging, and if the fix changes behaviour he verified, say so and get it re-checked
+   rather than treating the earlier signoff as still valid. Merging on an unverified repair can
+   ship a defect worse than the one it fixed.
 9. **Squash merge**, then delete the branch and any worktree.
 10. **Rebuild and restart** if anything changed since step 5, clean up stale builds and binaries,
     and report the repo is clean.
