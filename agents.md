@@ -201,22 +201,26 @@ purpose, because the CLI is exactly what is unreachable when he is away from his
   Never `sleep`, `tail -f`, or a polling loop.
 - **On `[sm remind]`**: run `sm status "what you are doing now"` and carry on. It is not an
   interrupt. Call `sm task-complete` when you finish so reminders stop firing at an idle seat.
-- **`sm context-monitor enable`** warns at 50% and flags critical at 65%. A single agent owning a
-  ticket end to end can compact mid-loop and lose the ticket's history with no warning.
+- **`sm context-monitor enable`** warns at 50% and flags critical at 65%. This matters for Claude
+  seats, where a single agent owning a ticket end to end can compact mid-loop and lose the
+  ticket's history with no warning. Codex seats can let autocompact do its thing.
 - **`sm handoff` erases your context** and wakes you with the doc you wrote. Write the doc first.
   Running it before writing leaves nothing to resume from.
 - **File writes take workspace locks automatically.** If an edit blocks, another agent holds the
   lock — check with `sm others` rather than retrying or working around it.
 - **Stop and ask when you are stuck.** Tests failing for reasons you cannot explain, the same
   failure two or three times running, or no clear way forward means escalate — not another lap.
-  Email him with `sm email rajesh` when it genuinely blocks, and say so in the subject.
+  Assume he is at the terminal: say it there first, and set a 30-minute reminder
+  (`sm remind 1800 "<what you are blocked on>"`). If he replies, cancel it. If the 30 minutes
+  elapse with no reply, `sm email rajesh` and say in the subject that it blocks.
 
 ---
 
 ## 7. Conventions
 
 - **Never commit directly to the default branch.** Work on a branch, merge through a PR.
-- **Rajesh reviews in the PR.** Do not merge something he is still reading.
+- **Doc PRs wait for his review; code PRs do not.** A code PR follows the loop above and merges on
+  convergence — do not hold it for him unless he has explicitly said he is reading it.
 - **Agents talk to each other with `sm send`.** Claude agents default to the wrong transport and
   must be told. Never poll another agent's output — go idle and you will be woken. Keep
   inter-agent traffic to what the work requires; no status chatter.
