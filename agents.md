@@ -48,7 +48,10 @@ does not have your context loaded.
 ## 2. The work loop
 
 1. **Understand the actual problem.** These tickets usually come from something he observed. If
-   the report is a symptom, find the cause before proposing a fix.
+   the report is a symptom, find the cause before proposing a fix. **Do not diagnose by reading
+   code alone** — run it against real data, add temporary tracing, and compare what happens to
+   what should happen. A plausible theory that was never executed is not a diagnosis, and this
+   project has a long history of confident wrong ones.
 2. **Smoke test early.** Confirm you can read the state, reach the device, or reproduce the bug
    *before* writing the full implementation. Writing the whole change and then discovering the
    basic path does not work is the most common way to waste a cycle here.
@@ -59,6 +62,11 @@ does not have your context loaded.
    substitute for the suite. If you hit a failure that looks pre-existing or unrelated, do not
    silently skip it — file an issue with the test name, the assertion, and whether it predates your
    change, and reference it in your PR.
+
+   Run the repo's **build verification too** — type check, lint, whatever it has. A green test run
+   with a red lint still fails CI after he has signed off. For a bug fix, write the test so it
+   **fails before your change and passes after**; a test written afterwards can pass for the wrong
+   reason and cover nothing.
 
    **The green must be on the exact code you ship.** Any edit after a green run invalidates it —
    his feedback in step 6, a review fix in step 8, a rebase, a last-minute tidy. Run the suite
@@ -71,11 +79,18 @@ does not have your context loaded.
    will waive this step explicitly when there is nothing to check or he is unavailable; do not
    assume the waiver.
 7. **Open the PR** once he has signed off, on a green run of the code you are actually shipping.
+   Before you do: revert any debug prints or tracing you added in step 1, and check that anything
+   you built is actually wired in — a component that exists but is never imported, a handler never
+   registered, or a config option nothing reads is not a finished ticket. Reference the issue with
+   `Fixes #N`, exactly once, and confirm the number is the issue this change actually fixes.
 8. **Run the review loop** below until it exits. A review fix is new code and lands after both
    gates: re-run step 4 before merging, and if the fix changes behaviour he verified, say so and
    get it re-checked rather than treating the earlier signoff as still valid. Merging on an
    unverified repair can ship a defect worse than the one it fixed.
-9. **Squash merge**, then delete the branch and any worktree.
+9. **Squash merge**, then delete the branch and any worktree. If the merge had conflicts, check
+   afterwards that features merged since your branch point still exist — conflict resolution can
+   silently drop code that was never in your diff, so neither review nor his smoke test would
+   catch it.
 10. **Return the persistent checkout to the default branch and pull.** Merging from a worktree
     leaves it sitting at its pre-merge commit, so the next ticket branches from code that is
     missing the change you just landed.
@@ -165,7 +180,34 @@ purpose, because the CLI is exactly what is unreachable when he is away from his
 
 ---
 
-## 6. Conventions
+## 6. Working with Session Manager
+
+- **`sm register <role>`** takes a named seat; `sm lookup <role>` resolves it and `sm roster` lists
+  what is actually seated. A standing seat that never registers cannot be found by anyone.
+- **Report completion to whoever dispatched you.** If an agent sent you the work, `sm send` your
+  result back to it when you finish or get blocked. It is idle waiting for you and nothing else
+  will wake it. If Rajesh dispatched you, finishing in your own console is enough.
+- **Waiting on another agent**: go idle, do not poll. If you need a status, `sm what <id>`
+  summarises it without pulling their output into your context — use it sparingly. If an expected
+  reply never comes, `sm wait <id> <timeout>` (600s is reasonable for a review) and then message
+  them directly rather than waiting forever.
+- **Waiting on something external** — a build, a log, an exit-code file — use `sm watch-job add`.
+  Never `sleep`, `tail -f`, or a polling loop.
+- **On `[sm remind]`**: run `sm status "what you are doing now"` and carry on. It is not an
+  interrupt. Call `sm task-complete` when you finish so reminders stop firing at an idle seat.
+- **`sm context-monitor enable`** warns at 50% and flags critical at 65%. A single agent owning a
+  ticket end to end can compact mid-loop and lose the ticket's history with no warning.
+- **`sm handoff` erases your context** and wakes you with the doc you wrote. Write the doc first.
+  Running it before writing leaves nothing to resume from.
+- **File writes take workspace locks automatically.** If an edit blocks, another agent holds the
+  lock — check with `sm others` rather than retrying or working around it.
+- **Stop and ask when you are stuck.** Tests failing for reasons you cannot explain, the same
+  failure two or three times running, or no clear way forward means escalate — not another lap.
+  Email him with `sm email rajesh` when it genuinely blocks, and say so in the subject.
+
+---
+
+## 7. Conventions
 
 - **Never commit directly to the default branch.** Work on a branch, merge through a PR.
 - **Rajesh reviews in the PR.** Do not merge something he is still reading.
@@ -184,3 +226,13 @@ purpose, because the CLI is exactly what is unreachable when he is away from his
 - **A ticket or handoff must stand alone.** Write it so an agent with no context can pick it up
   cold. If your successor asks a question you already asked, or repeats a mistake already
   corrected, the handoff failed.
+- **Check for an existing issue before filing a new one.** Duplicates are how a backlog grows
+  while everyone is closing things.
+- **Edit a ticket rather than commenting on it**, until work has actually started. A ticket nobody
+  has worked should read as its current intent, not as a thread to reconstruct.
+- **File the ticket first, then name the doc after it** — `<ticket#>_<short_name>` in the repo's
+  docs directory — so the doc can be found from the ticket and back.
+- **One file per concern, overwritten in place.** No date suffixes, no `_v2`, no parallel copies.
+  A reader must never have to work out which of two files is live.
+- **When you delete code, delete it.** No comment explaining what used to be there, no dead config
+  option that nothing reads, no field left always-null. The next agent will code against it.
