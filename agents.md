@@ -53,17 +53,22 @@ does not have your context loaded.
    substitute for the suite. If you hit a failure that looks pre-existing or unrelated, do not
    silently skip it — file an issue with the test name, the assertion, and whether it predates your
    change, and reference it in your PR.
+
+   **The green must be on the exact code you ship.** Any edit after a green run invalidates it —
+   his feedback in step 6, a review fix in step 8, a rebase, a last-minute tidy. Run the suite
+   again before you move on. This applies every time round the loop, not only the first.
 5. **Build, install, and restart the thing** in its real location, then tell him it is ready to
    test. The specifics are in each repo's own `AGENTS.md`.
 6. **Wait for his verification.** He tests it himself — physically, in the app, on the device.
-   Iterate on his feedback until he signs off. He will waive this step explicitly when there is
-   nothing to check or he is unavailable; do not assume the waiver.
-7. **Open the PR** once he has signed off.
-8. **Run the review loop** below until it exits. **A review fix is new code.** It lands after the
-   suite ran in step 4 and after he signed off in step 6, so neither covers it: re-run the suite
-   before merging, and if the fix changes behaviour he verified, say so and get it re-checked
-   rather than treating the earlier signoff as still valid. Merging on an unverified repair can
-   ship a defect worse than the one it fixed.
+   Iterate on his feedback until he signs off, re-running step 4 and redeploying on each pass —
+   his feedback produces code, and code he has not seen running is not code he has verified. He
+   will waive this step explicitly when there is nothing to check or he is unavailable; do not
+   assume the waiver.
+7. **Open the PR** once he has signed off, on a green run of the code you are actually shipping.
+8. **Run the review loop** below until it exits. A review fix is new code and lands after both
+   gates: re-run step 4 before merging, and if the fix changes behaviour he verified, say so and
+   get it re-checked rather than treating the earlier signoff as still valid. Merging on an
+   unverified repair can ship a defect worse than the one it fixed.
 9. **Squash merge**, then delete the branch and any worktree.
 10. **Rebuild and restart** if anything changed since step 5, clean up stale builds and binaries,
     and report the repo is clean.
