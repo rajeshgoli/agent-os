@@ -15,8 +15,8 @@ feature, and he is often waiting on the result.
 
 That means no orchestration. No waves, lanes, gates, or handoff protocol. If you find yourself
 designing a multi-agent plan for one of these repos, you have misread the size of the job. Two or
-three agents in parallel is the practical ceiling, and they should be decoupled well enough that
-coordination is a single message when a PR lands.
+three agents in parallel is the practical ceiling, and their work must be decoupled well enough
+that coordination is a single message when a PR lands.
 
 **Parallel agents never share a checkout.** Each works in its own worktree on its own branch.
 Picking non-overlapping tickets is not enough: agents in one checkout share the index, HEAD, and
