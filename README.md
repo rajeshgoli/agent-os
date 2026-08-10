@@ -27,8 +27,20 @@ Read `.agent-os/agents.md` for how work runs in this repo.
 # [Project-specific content below]
 ```
 
-A repo whose root `AGENTS.md` is auto-loaded still needs that first line, because the submodule
-file is not loaded automatically — the agent has to go read it.
+That first line is required. The submodule file is never loaded automatically — the agent has to
+be told to go read it.
+
+For Claude Code, give the repo a root `CLAUDE.md` carrying the same content, so the pointer is
+picked up regardless of which filename that version auto-loads:
+
+```bash
+ln -sf AGENTS.md CLAUDE.md
+```
+
+**Do not symlink this into `~/.claude/CLAUDE.md`.** The old setup did that to apply the workflow
+to every project at once. It is now wrong: these rules describe small single-agent tickets, and a
+global symlink would apply them to `fractal-algo-rust`, which has its own and very different
+contract. Wire it per repo.
 
 ## The main project does not use this
 
