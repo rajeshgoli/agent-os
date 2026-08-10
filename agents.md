@@ -92,7 +92,11 @@ Then:
 
 1. **Classify every finding: valid, partially valid, or invalid.** Do not skip this. A review is
    not gospel — push back with reasoning where it is wrong.
-2. **Correctness only.** No document nits, no wording preferences, no process commentary.
+2. **Correctness only** — no document nits, no wording preferences, no nits about following
+   process for process's sake. That excludes process *preference*, not process *correctness*:
+   when the thing under review is a workflow, an instruction file, CI, or a deploy step, its
+   behaviour is the correctness surface, and a defect in it is a correctness finding however
+   procedural it sounds. "This deploys without re-running the tests" is a bug, not a nit.
 3. **Any unresolved P1 blocks.** A round that returns only P2 or lower, or a clean review, exits
    the loop. Do not keep chasing P2s and P3s.
 4. Fix, push, and re-review at the exact head. Fewest rounds to correctness — which does not mean
