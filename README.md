@@ -53,21 +53,23 @@ to every project at once. It is now wrong: these rules describe small single-age
 global symlink would apply them to `fractal-algo-rust`, which has its own and very different
 contract. Wire it per repo.
 
-If a machine still has that symlink from the old setup, remove it — not creating it is not the
-same as it being gone, and a stale one keeps loading this contract into every repo including the
-one that must not have it. Check that it is a symlink into `agent-os` before touching it, so a
-real global `CLAUDE.md` is never deleted:
+If a machine still has that symlink from the old setup, it needs removing — not creating it is not
+the same as it being gone, and a stale one keeps loading this contract into every repo including
+the one that must not have it. Check what is there:
 
 ```bash
-case "$(readlink ~/.claude/CLAUDE.md 2>/dev/null)" in
-  *agent-os*) rm ~/.claude/CLAUDE.md && echo "removed legacy agent-os symlink" ;;
-  *)          echo "left alone: absent, a real file, or pointing somewhere else" ;;
-esac
+readlink ~/.claude/CLAUDE.md      # empty means absent or a real file — either way, leave it
 ```
 
-The check and the removal are one statement on purpose. A validating command on one line and an
-unconditional `rm` on the next reads as a guard and is not one — the `rm` runs whatever the check
-printed.
+Delete it **only** if it resolves to the old `~/.agent-os/agents.md`. Anything else — a real file,
+or a symlink to some other configuration — is someone's live setup and is not this migration's to
+touch.
+
+Removing it is left as a manual step on purpose. A copy-pasteable `rm` guarded by a pattern is how
+this instruction went wrong twice: first an unconditional `rm` on the line after its own check,
+then a glob that also matched paths like `~/custom-agent-os-config/`. The check above is
+read-only, and one person deleting one symlink deliberately is safer than any guard written for a
+machine state nobody has confirmed.
 
 ## The main project does not use this
 
