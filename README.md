@@ -30,12 +30,23 @@ Read `.agent-os/agents.md` for how work runs in this repo.
 That first line is required. The submodule file is never loaded automatically — the agent has to
 be told to go read it.
 
-For Claude Code, give the repo a root `CLAUDE.md` carrying the same content, so the pointer is
-picked up regardless of which filename that version auto-loads:
+For Claude Code, the repo also needs a root `CLAUDE.md` carrying the same pointer, so it is picked
+up regardless of which filename the running version auto-loads. **Check what is already there
+first — an older layout kept project-specific rules in `CLAUDE.md`, and overwriting it loses
+them.**
 
 ```bash
-ln -sf AGENTS.md CLAUDE.md
+ls -l CLAUDE.md          # symlink, real file, or absent?
 ```
+
+- **Absent** — create the symlink: `ln -s AGENTS.md CLAUDE.md`
+- **Already a symlink to `AGENTS.md`** — nothing to do.
+- **A real file** — read it. Anything in it that `AGENTS.md` does not already say has to be merged
+  into `AGENTS.md` first. Only once the content is in `AGENTS.md` may the file be replaced with the
+  symlink. Never `ln -sf` over it; `-f` deletes the destination.
+
+As of this writing `session-manager/CLAUDE.md` is a real file of about 140 lines that its
+`AGENTS.md` does not contain, so that repo needs the merge before it needs the symlink.
 
 **Do not symlink this into `~/.claude/CLAUDE.md`.** The old setup did that to apply the workflow
 to every project at once. It is now wrong: these rules describe small single-agent tickets, and a
