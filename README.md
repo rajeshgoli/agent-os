@@ -1,86 +1,40 @@
 # agent-os
 
-Workflow system for AI coding agents. Provides personas, review protocols, and conventions that work across Claude Code and Codex.
+Shared agent instructions for Rajesh's supporting repos: **deskbar**, **office-automate**,
+**finviz**, and **session-manager**. Works across Claude Code and Codex.
 
-## Branches
+Everything is in one file: [`agents.md`](agents.md). It covers how work runs in these repos — the
+work loop, the review loop, teardown, how to write for the owner, and the one way session-manager
+differs. Each repo's own `AGENTS.md` carries what is specific to it.
 
-| Branch | Philosophy | Use when... |
-|--------|-----------|-------------|
-| `main` | **Infra mode** — fix everything, sequential epics, full test coverage | The codebase is stable infrastructure. Correctness is paramount. |
-| `research` | **Research mode** — strategy docs, validation gates, parallel execution, speed over elegance | The codebase is exploratory. You're discovering what to build. |
-
-Repos select a branch via git submodule tracking (see Setup below). The `research` branch adds personas for orchestrator, reviewer, spec-owner, and spec-reviewer roles, along with a strategy doc / execution ticket document model.
-
-## What's in here
-
-- **agents.md** — Core workflow instructions (attribution, review protocol, role invocation, ticket conventions)
-- **personas/** — Role definitions (engineer, architect, product, scout, ux, em, director)
+There are no persona files. Modern models do not need a character sheet to act as an engineer or
+a reviewer; what they need is the policy, and policy lives in `agents.md`. The persona directory
+was removed in the rewrite — see git history if you need what it said.
 
 ## Setup
 
-### Claude Code (local)
-
-Symlink so Claude Code auto-loads the workflow for all projects:
+Add as a submodule:
 
 ```bash
-ln -sf ~/.agent-os/agents.md ~/.claude/CLAUDE.md
-```
-
-Project-specific instructions stay in each project's `CLAUDE.md`.
-
-### Codex (in-repo)
-
-Add as a submodule. Use the `branch` option to select the philosophy:
-
-```bash
-# Infra mode (default — this branch)
 git submodule add git@github.com:rajeshgoli/agent-os.git .agent-os
-
-# Research mode
-git submodule add -b research git@github.com:rajeshgoli/agent-os.git .agent-os
 ```
 
-Then in your project's `AGENTS.md`:
+Then point the repo's `AGENTS.md` at it, above the project-specific content:
 
 ```markdown
-Read .agent-os/agents.md for workflow instructions and persona definitions.
+Read `.agent-os/agents.md` for how work runs in this repo.
 
 # [Project-specific content below]
 ```
 
-## Personas
+A repo whose root `AGENTS.md` is auto-loaded still needs that first line, because the submodule
+file is not loaded automatically — the agent has to go read it.
 
-| Role | File | Purpose |
-|------|------|---------|
-| Engineer | `personas/engineer.md` | Implement from specs, write tests, create PRs |
-| Architect | `personas/architect.md` | Review PRs, maintain architectural vision |
-| Product | `personas/product.md` | Surface needs, interview users, set direction |
-| Scout | `personas/scout.md` | Investigate bugs, write specs (no fixes) |
-| UX | `personas/ux.md` | Review UI specs for consistency and completeness |
-| EM | `personas/em.md` | Orchestrate multi-agent workflows |
-| Director | `personas/director.md` | Maintain the workflow system itself |
+## The main project does not use this
 
-## How it works
+`fractal-algo-rust` carries its own self-contained `AGENTS.md` at its repo root, with no submodule
+and no indirection. Its workflow — parallel agents, epics, waves, review gates — is a different
+shape from the small single-agent tickets these repos run on, and merging the two produced a file
+that fit neither.
 
-```
-┌─────────────────────────────┐     ┌──────────────────────────────┐
-│  ~/.agent-os/agents.md      │     │  project/CLAUDE.md           │
-│  (generic workflow)         │     │  (project-specific)          │
-│                             │     │                              │
-│  - Review protocol          │     │  - Dev commands              │
-│  - Role invocation          │     │  - Data formats              │
-│  - Ticket conventions       │     │  - Branch rules              │
-│  - Attribution policy       │     │  - Debugging methodology     │
-└─────────────┬───────────────┘     └──────────────┬───────────────┘
-              │                                    │
-              │  symlink                           │  auto-loaded
-              ▼                                    ▼
-        ~/.claude/CLAUDE.md              project/CLAUDE.md
-              │                                    │
-              └────────────┐  ┌────────────────────┘
-                           ▼  ▼
-                    Claude Code agent
-                   (sees both files)
-```
-
-Codex gets the same content via `.agent-os` submodule + `AGENTS.md`.
+The `research` branch here served that project before the split and is superseded.
